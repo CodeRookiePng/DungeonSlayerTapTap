@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.UI; // <-- TOTO SME PRIDALI (aby skript videl UI komponenty)
+using UnityEngine.UI;
 
 public partial class EnemyHealth : MonoBehaviour
 {
@@ -7,8 +7,10 @@ public partial class EnemyHealth : MonoBehaviour
     public float maxHealth = 150f;
     private float currentHealth;
 
-    [Header("UI Prepojenie")] // <-- TOTO SME PRIDALI
+    [Header("UI Prepojenie")]
     public Slider healthSlider;
+    public GameObject damageTextPrefab;
+    public Transform canvasTransform;
 
     [Header("Efekty")]
     public Color damageColor = Color.red;
@@ -21,7 +23,6 @@ public partial class EnemyHealth : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalColor = spriteRenderer.color;
 
-        // Nastavíme bar na začiatku na maximum
         if (healthSlider != null)
         {
             healthSlider.maxValue = maxHealth;
@@ -31,28 +32,28 @@ public partial class EnemyHealth : MonoBehaviour
 
     void OnMouseDown()
     {
-        TakeDamage(10f); // Každý klik uberie 10 HP (aby si videl pohyb na bare)
+        TakeDamage(10f);
     }
 
     void TakeDamage(float amount)
     {
         currentHealth -= amount;
+        if (healthSlider != null) healthSlider.value = currentHealth;
 
-        // AKTUALIZÁCIA BARU
-        if (healthSlider != null)
+        if (damageTextPrefab != null && canvasTransform != null)
         {
-            healthSlider.value = currentHealth;
-        }
+            GameObject textObj = Instantiate(damageTextPrefab, Input.mousePosition, Quaternion.identity, canvasTransform);
 
-        Debug.Log("Medúza dostala pecku! HP: " + currentHealth);
+            // Fix: Ak by to hádzalo chybu s LastSibling, pridaj to sem
+            textObj.transform.SetAsLastSibling();
+
+            textObj.GetComponent<TMPro.TextMeshProUGUI>().text = "-" + amount.ToString();
+            Destroy(textObj, 1f);
+        }
 
         StopAllCoroutines();
         StartCoroutine(FlashEffect());
-
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        if (currentHealth <= 0) Die();
     }
 
     System.Collections.IEnumerator FlashEffect()
