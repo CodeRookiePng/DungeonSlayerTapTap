@@ -7,7 +7,7 @@ public class EnemyHealth : MonoBehaviour
     [Header("Nastavenia Nepriateľa")]
     public float maxHealth = 150f;
     private float currentHealth;
-    public float respawnTime = 3f;
+    public float respawnTime = 1f;
     public int coinReward = 15; // Koľko coinov dostaneš za smrť
 
     [Header("UI Prepojenie")]
@@ -43,14 +43,19 @@ public class EnemyHealth : MonoBehaviour
 
     void OnMouseDown()
     {
+        // Kontrola, aby sme neklikali na mŕtvolu alebo príliš rýchlo
         if (isDead || Time.time < nextDamageTime) return;
         nextDamageTime = Time.time + damageCooldown;
 
-        // NAHLÁSENIE KLIKU DO MANAGERU
-        if (GameManager.instance != null) GameManager.instance.AddClick();
+        // Nahlásenie kliku do štatistík
+        if (GameManager.instance != null)
+            GameManager.instance.AddClick();
 
-        TakeDamage(10f);
-        SpawnDamagePopup(10f); // Zavoláme funkciu pre text
+        // Získanie poškodenia z GameManageru (to, čo si si vylepšil)
+        float currentDmg = (GameManager.instance != null) ? GameManager.instance.clickDamage : 10f;
+
+        TakeDamage(currentDmg);
+        SpawnDamagePopup(currentDmg);
     }
 
     public void TakeDamage(float amount)
@@ -66,14 +71,15 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    // Funkcia pre tie lietajúce čísla (zajtra fixneme ak nepôjdu)
     void SpawnDamagePopup(float amount)
     {
         if (damageTextPrefab != null && canvasTransform != null)
         {
             Vector3 spawnPos = Camera.main.WorldToScreenPoint(transform.position);
             GameObject textObj = Instantiate(damageTextPrefab, spawnPos, Quaternion.identity, canvasTransform);
-            textObj.GetComponent<TMPro.TextMeshProUGUI>().text = "-" + amount;
+
+            // Zaokrúhlime číslo na 1 desatinné miesto, aby tam nebolo 15.0000001
+            textObj.GetComponent<TMPro.TextMeshProUGUI>().text = "-" + amount.ToString("F1");
             Destroy(textObj, 1f);
         }
     }
@@ -92,7 +98,7 @@ public class EnemyHealth : MonoBehaviour
 
         Debug.Log("Medúza padla!");
 
-        // NAHLÁSENIE ZABITIA A COINOV DO MANAGERU
+        // Odmena za zabitie
         if (GameManager.instance != null)
         {
             GameManager.instance.AddKill(coinReward);

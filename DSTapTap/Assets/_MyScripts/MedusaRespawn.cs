@@ -3,7 +3,7 @@ using System.Collections;
 
 public class MedusaRespawn : MonoBehaviour
 {
-    public float respawnTime = 2f;
+    public float respawnTime = 1f;
     private SpriteRenderer sr;
 
     void Start()
