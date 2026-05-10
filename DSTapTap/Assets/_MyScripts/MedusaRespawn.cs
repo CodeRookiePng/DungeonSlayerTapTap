@@ -10,28 +10,33 @@ public class MedusaRespawn : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         if (sr == null) Debug.LogError("Kámo, na tomto objekte nie je SpriteRenderer!");
-        Debug.Log("Skript nabehol na: " + gameObject.name);
     }
 
     void Update()
     {
+        // Testovacie zabitie klávesou K
         if (Input.GetKeyDown(KeyCode.K))
         {
-            Debug.Log("Stlačil si K, skúšam zabiť Medúzu...");
             Die();
         }
     }
 
     public void Die()
     {
-        StartCoroutine(RespawnSequence());
+        Debug.Log("Medúza zomrela, žiadam GameManager o respawn...");
+        sr.enabled = false;
+
+        // Namiesto vlastnej Coroutine zavoláme tú v GameManageri
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.RequestRespawn(this.gameObject, respawnTime);
+        }
     }
 
-    IEnumerator RespawnSequence()
+    // Túto funkciu zavolá GameManager po uplynutí času
+    public void ResetMedusa()
     {
-        sr.enabled = false;
-        yield return new WaitForSeconds(respawnTime);
         sr.enabled = true;
-        Debug.Log("Medúza oživená!");
+        Debug.Log("Medúza oživená cez GameManager!");
     }
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using TMPro;
+using System.Collections; // Potrebné pre IEnumerator
 
 public class GameManager : MonoBehaviour
 {
@@ -9,14 +10,26 @@ public class GameManager : MonoBehaviour
     public int totalClicks = 0;
     public int monstersKilled = 0;
     public int coins = 0;
+    public int totalCoinsEarned = 0;
+    public int totalCoinsSpent = 0;
+    public float totalDamageDone = 0f;
 
     [Header("UI Texty")]
     public TextMeshProUGUI coinText;
     public TextMeshProUGUI statsClickText;
     public TextMeshProUGUI statsKilledText;
+    public TextMeshProUGUI statsEarnedText;
+    public TextMeshProUGUI statsSpentText;
+    public TextMeshProUGUI statsDamageText;
 
     [Header("Panely")]
     public GameObject statsPanel;
+
+    [Header("Crit Upgrade Nastavenia")]
+    public float critChance = 5f;        // Šanca v percentách
+    public float critMultiplier = 2f;    // Násobiteľ kritického zásahu
+    public int critUpgradePrice = 150;
+    public TextMeshProUGUI critUpgradePriceText;
 
     [Header("Damage Upgrade (DMG)")]
     public float clickDamage = 10f;
@@ -30,7 +43,6 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton pattern - nastavíme inštanciu hneď pri zrodení
         if (instance == null) instance = this;
     }
 
@@ -48,51 +60,90 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
-    public void AddKill(int baseReward)
+    public void AddDamageStat(float amount)
     {
-        monstersKilled++;
-
-        // Výpočet odmeny s násobiteľom a zaokrúhlenie na celé číslo
-        int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier);
-        coins += finalReward;
-
+        totalDamageDone += amount;
         UpdateUI();
     }
 
-    // Funkcia pre Damage Upgrade Button
+    public void AddKill(int baseReward)
+    {
+        monstersKilled++;
+        int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier);
+        coins += finalReward;
+        totalCoinsEarned += finalReward;
+        UpdateUI();
+    }
+
+    // --- UPGRADY ---
+
     public void UpgradeDamage()
     {
         if (coins >= upgradePrice)
         {
+            totalCoinsSpent += upgradePrice;
             coins -= upgradePrice;
             clickDamage *= 1.5f;
             upgradePrice *= 2;
             UpdateUI();
         }
-        else
-        {
-            Debug.Log("Malo peňazí na DMG upgrade!");
-        }
     }
 
-    // Funkcia pre Coins Multiplayer Button
     public void UpgradeCoins()
     {
         if (coins >= coinUpgradePrice)
         {
+            totalCoinsSpent += coinUpgradePrice;
             coins -= coinUpgradePrice;
             coinMultiplier *= 1.5f;
-            // Cena rastie o 2.25x a zaokrúhlime ju
             coinUpgradePrice = Mathf.RoundToInt(coinUpgradePrice * 2.25f);
             UpdateUI();
         }
-        else
+    }
+
+    public void UpgradeCritChance()
+    {
+        if (coins >= critUpgradePrice)
         {
-            Debug.Log("Malo peňazí na Coins upgrade!");
+            totalCoinsSpent += critUpgradePrice;
+            coins -= critUpgradePrice;
+
+            critChance += 2f;
+            critUpgradePrice = Mathf.RoundToInt(critUpgradePrice * 2.5f);
+
+            UpdateUI();
         }
     }
 
-    // --- UI FUNKCIE ---
+    // --- RESPANN LOGIKA (Fixnutý Bug) ---
+
+    public void RequestRespawn(GameObject entity, float delay)
+    {
+        StartCoroutine(HandleRespawn(entity, delay));
+    }
+
+    private IEnumerator HandleRespawn(GameObject entity, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (entity != null)
+        {
+            // Skúsime nájsť skript MedusaRespawn (ten testovací)
+            var respawnScript = entity.GetComponent<MedusaRespawn>();
+            if (respawnScript != null)
+            {
+                respawnScript.ResetMedusa();
+            }
+            else
+            {
+                // Ak používaš hlavný EnemyHealth, zavoláme ten
+                var healthScript = entity.GetComponent<EnemyHealth>();
+                if (healthScript != null) healthScript.ResetEnemy();
+            }
+        }
+    }
+
+    // --- UI ---
 
     public void ToggleStats()
     {
@@ -105,15 +156,15 @@ public class GameManager : MonoBehaviour
 
     public void UpdateUI()
     {
-        // Základné UI
         if (coinText != null) coinText.text = "Coins: " + coins;
         if (statsClickText != null) statsClickText.text = "Total Clicks: " + totalClicks;
         if (statsKilledText != null) statsKilledText.text = "Monsters Killed: " + monstersKilled;
+        if (statsEarnedText != null) statsEarnedText.text = "Total Earned: " + totalCoinsEarned;
+        if (statsSpentText != null) statsSpentText.text = "Total Spent: " + totalCoinsSpent;
+        if (statsDamageText != null) statsDamageText.text = "Total Damage: " + Mathf.FloorToInt(totalDamageDone);
 
-        // Upgrade DMG Text
         if (upgradePriceText != null) upgradePriceText.text = "Price: " + upgradePrice;
-
-        // Upgrade Coins Text
         if (coinUpgradePriceText != null) coinUpgradePriceText.text = "Price: " + coinUpgradePrice;
+        if (critUpgradePriceText != null) critUpgradePriceText.text = "Price: " + critUpgradePrice;
     }
 }

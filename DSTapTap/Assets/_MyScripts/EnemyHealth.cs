@@ -8,12 +8,12 @@ public class EnemyHealth : MonoBehaviour
     public float maxHealth = 150f;
     private float currentHealth;
     public float respawnTime = 1f;
-    public int coinReward = 15; // Koľko coinov dostaneš za smrť
+    public int coinReward = 15;
 
     [Header("UI Prepojenie")]
     public Slider healthSlider;
-    public GameObject damageTextPrefab; // Pre tie Damage Popupy
-    public Transform canvasTransform;   // Pre tie Damage Popupy
+    public GameObject damageTextPrefab;
+    public Transform canvasTransform;
 
     [Header("Vizuálne Efekty")]
     public Color damageColor = Color.red;
@@ -43,19 +43,30 @@ public class EnemyHealth : MonoBehaviour
 
     void OnMouseDown()
     {
-        // Kontrola, aby sme neklikali na mŕtvolu alebo príliš rýchlo
         if (isDead || Time.time < nextDamageTime) return;
         nextDamageTime = Time.time + damageCooldown;
 
-        // Nahlásenie kliku do štatistík
         if (GameManager.instance != null)
+        {
             GameManager.instance.AddClick();
 
-        // Získanie poškodenia z GameManageru (to, čo si si vylepšil)
-        float currentDmg = (GameManager.instance != null) ? GameManager.instance.clickDamage : 10f;
+            // Získame základné poškodenie
+            float damageToDeal = GameManager.instance.clickDamage;
 
-        TakeDamage(currentDmg);
-        SpawnDamagePopup(currentDmg);
+            // LOGIKA PRE KRITICKÝ ZÁSAH
+            float roll = Random.Range(0f, 100f);
+            if (roll <= GameManager.instance.critChance)
+            {
+                damageToDeal *= GameManager.instance.critMultiplier;
+                Debug.Log("<color=yellow>CRITICAL HIT!</color> Poškodenie: " + damageToDeal);
+            }
+
+            // Nahlásenie finálneho poškodenia do štatistík
+            GameManager.instance.AddDamageStat(damageToDeal);
+
+            TakeDamage(damageToDeal);
+            SpawnDamagePopup(damageToDeal);
+        }
     }
 
     public void TakeDamage(float amount)
@@ -71,6 +82,24 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
+    // TÚTO FUNKCIU VOLÁ GAMEMANAGER
+    public void ResetEnemy()
+    {
+        isDead = false;
+        currentHealth = maxHealth;
+
+        if (healthSlider != null)
+        {
+            healthSlider.value = maxHealth;
+            healthSlider.gameObject.SetActive(true);
+        }
+
+        spriteRenderer.enabled = true;
+        if (col != null) col.enabled = true;
+
+        Debug.Log("Medúsa bola úspešne oživená cez ResetEnemy!");
+    }
+
     void SpawnDamagePopup(float amount)
     {
         if (damageTextPrefab != null && canvasTransform != null)
@@ -78,7 +107,6 @@ public class EnemyHealth : MonoBehaviour
             Vector3 spawnPos = Camera.main.WorldToScreenPoint(transform.position);
             GameObject textObj = Instantiate(damageTextPrefab, spawnPos, Quaternion.identity, canvasTransform);
 
-            // Zaokrúhlime číslo na 1 desatinné miesto, aby tam nebolo 15.0000001
             textObj.GetComponent<TMPro.TextMeshProUGUI>().text = "-" + amount.ToString("F1");
             Destroy(textObj, 1f);
         }
@@ -96,36 +124,18 @@ public class EnemyHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        Debug.Log("Medúza padla!");
-
-        // Odmena za zabitie
         if (GameManager.instance != null)
         {
             GameManager.instance.AddKill(coinReward);
+            // HLAVNÁ ZMENA: Žiadosť o respawn posielame manageru
+            GameManager.instance.RequestRespawn(this.gameObject, respawnTime);
         }
 
-        StartCoroutine(RespawnSequence());
-    }
-
-    IEnumerator RespawnSequence()
-    {
+        // Skryjeme nepriateľa
         spriteRenderer.enabled = false;
         if (col != null) col.enabled = false;
         if (healthSlider != null) healthSlider.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(respawnTime);
-
-        currentHealth = maxHealth;
-        if (healthSlider != null)
-        {
-            healthSlider.value = maxHealth;
-            healthSlider.gameObject.SetActive(true);
-        }
-
-        spriteRenderer.enabled = true;
-        if (col != null) col.enabled = true;
-        isDead = false;
-
-        Debug.Log("Medúza je späť!");
+        Debug.Log("Medúsa padla, čakám na respawn od Managera...");
     }
 }
