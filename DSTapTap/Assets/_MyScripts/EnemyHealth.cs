@@ -8,9 +8,12 @@ public class EnemyHealth : MonoBehaviour
     public float maxHealth = 150f;
     private float currentHealth;
     public float respawnTime = 3f;
+    public int coinReward = 15; // Koľko coinov dostaneš za smrť
 
     [Header("UI Prepojenie")]
     public Slider healthSlider;
+    public GameObject damageTextPrefab; // Pre tie Damage Popupy
+    public Transform canvasTransform;   // Pre tie Damage Popupy
 
     [Header("Vizuálne Efekty")]
     public Color damageColor = Color.red;
@@ -20,7 +23,7 @@ public class EnemyHealth : MonoBehaviour
 
     [Header("Nastavenia Klikania")]
     private float nextDamageTime = 0f;
-    public float damageCooldown = 0.2f; // Minimálna pauza medzi klikmi
+    public float damageCooldown = 0.1f;
 
     private bool isDead = false;
 
@@ -37,56 +40,48 @@ public class EnemyHealth : MonoBehaviour
             healthSlider.value = maxHealth;
         }
     }
-    void OnEnable()
-    {
-        // Ak je medúza mŕtva v momente, keď zapneš obrazovku,
-        // pre istotu reštartujeme respawn, aby tam neostala visieť navždy.
-        if (isDead)
-        {
-            StopAllCoroutines(); // Zastavíme staré zaseknuté pokusy
-            StartCoroutine(RespawnSequence());
-        }
-    }
 
-    // Hlavná metóda pre kliknutie
     void OnMouseDown()
     {
-        // Kontrola: Ak je mŕtva ALEBO klikáš príliš rýchlo, nerob nič
         if (isDead || Time.time < nextDamageTime) return;
-
-        // Nastavíme čas, kedy bude možný ďalší klik
         nextDamageTime = Time.time + damageCooldown;
 
+        // NAHLÁSENIE KLIKU DO MANAGERU
+        if (GameManager.instance != null) GameManager.instance.AddClick();
+
         TakeDamage(10f);
+        SpawnDamagePopup(10f); // Zavoláme funkciu pre text
     }
 
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
+        if (healthSlider != null) healthSlider.value = currentHealth;
 
-        // Aktualizácia Slidera
-        if (healthSlider != null)
-            healthSlider.value = currentHealth;
-
-        // Spustíme efekt sčervenania
         StartCoroutine(FlashEffect());
 
-        // Kontrola smrti
         if (currentHealth <= 0)
         {
             Die();
         }
     }
 
+    // Funkcia pre tie lietajúce čísla (zajtra fixneme ak nepôjdu)
+    void SpawnDamagePopup(float amount)
+    {
+        if (damageTextPrefab != null && canvasTransform != null)
+        {
+            Vector3 spawnPos = Camera.main.WorldToScreenPoint(transform.position);
+            GameObject textObj = Instantiate(damageTextPrefab, spawnPos, Quaternion.identity, canvasTransform);
+            textObj.GetComponent<TMPro.TextMeshProUGUI>().text = "-" + amount;
+            Destroy(textObj, 1f);
+        }
+    }
+
     IEnumerator FlashEffect()
     {
-        // Zmeníme farbu na červenú
         spriteRenderer.color = damageColor;
-
-        // Počkáme 0.1 sekundy
         yield return new WaitForSeconds(0.1f);
-
-        // Vrátime pôvodnú farbu
         spriteRenderer.color = originalColor;
     }
 
@@ -96,19 +91,24 @@ public class EnemyHealth : MonoBehaviour
         isDead = true;
 
         Debug.Log("Medúza padla!");
+
+        // NAHLÁSENIE ZABITIA A COINOV DO MANAGERU
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.AddKill(coinReward);
+        }
+
         StartCoroutine(RespawnSequence());
     }
 
     IEnumerator RespawnSequence()
     {
-        // Skryjeme medúzu a vypneme klikanie
         spriteRenderer.enabled = false;
         if (col != null) col.enabled = false;
         if (healthSlider != null) healthSlider.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(respawnTime);
 
-        // Reset hodnôt
         currentHealth = maxHealth;
         if (healthSlider != null)
         {
@@ -116,7 +116,6 @@ public class EnemyHealth : MonoBehaviour
             healthSlider.gameObject.SetActive(true);
         }
 
-        // Zobrazenie medúzy
         spriteRenderer.enabled = true;
         if (col != null) col.enabled = true;
         isDead = false;
