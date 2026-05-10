@@ -1,10 +1,14 @@
 ﻿using UnityEngine;
+using UnityEngine.UI; // <-- TOTO SME PRIDALI (aby skript videl UI komponenty)
 
 public partial class EnemyHealth : MonoBehaviour
 {
     [Header("Nastavenia Nepriateľa")]
-    public float maxHealth = 100f;
+    public float maxHealth = 150f;
     private float currentHealth;
+
+    [Header("UI Prepojenie")] // <-- TOTO SME PRIDALI
+    public Slider healthSlider;
 
     [Header("Efekty")]
     public Color damageColor = Color.red;
@@ -16,24 +20,35 @@ public partial class EnemyHealth : MonoBehaviour
         currentHealth = maxHealth;
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalColor = spriteRenderer.color;
+
+        // Nastavíme bar na začiatku na maximum
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = maxHealth;
+        }
     }
 
-    // Táto funkcia sa zavolá automaticky, keď klikneš na objekt s Colliderom
     void OnMouseDown()
     {
-        TakeDamage(10f); // Každý klik uberie 10 HP
+        TakeDamage(10f); // Každý klik uberie 10 HP (aby si videl pohyb na bare)
     }
 
     void TakeDamage(float amount)
     {
         currentHealth -= amount;
+
+        // AKTUALIZÁCIA BARU
+        if (healthSlider != null)
+        {
+            healthSlider.value = currentHealth;
+        }
+
         Debug.Log("Medúza dostala pecku! HP: " + currentHealth);
 
-        // Vizuálna odozva - bliknutie na červeno
         StopAllCoroutines();
         StartCoroutine(FlashEffect());
 
-        // Kontrola smrti
         if (currentHealth <= 0)
         {
             Die();
@@ -50,7 +65,6 @@ public partial class EnemyHealth : MonoBehaviour
     void Die()
     {
         Debug.Log("Medúza padla!");
-        // Tu môžeš pridať časticové efekty alebo animáciu
         Destroy(gameObject);
     }
 }
