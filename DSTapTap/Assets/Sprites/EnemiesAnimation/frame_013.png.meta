@@ -5,6 +5,12 @@ TextureImporter:
   - first:
       213: 3821608149902857604
     second: frame_013_0
+  - first:
+      213: -8156386102531454665
+    second: frame_013_1
+  - first:
+      213: -3390937062321186269
+    second: frame_013_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +43,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -46,12 +52,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 50
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -75,7 +81,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -129,10 +135,10 @@ TextureImporter:
       name: frame_013_0
       rect:
         serializedVersion: 2
-        x: 24
-        y: 2
-        width: 202
-        height: 254
+        x: 97
+        y: 31
+        width: 365
+        height: 476
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -147,11 +153,55 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: frame_013_1
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 504
+        width: 26
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7390eabdd02bece80800000000000000
+      internalID: -8156386102531454665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: frame_013_2
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 487
+        width: 15
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32a93a035b8f0f0d0800000000000000
+      internalID: -3390937062321186269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -162,6 +212,8 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       frame_013_0: 3821608149902857604
+      frame_013_1: -8156386102531454665
+      frame_013_2: -3390937062321186269
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
