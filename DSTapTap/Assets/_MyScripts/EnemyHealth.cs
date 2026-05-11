@@ -17,6 +17,7 @@ public class EnemyHealth : MonoBehaviour
 
     [Header("Vizuálne Efekty")]
     public Color damageColor = Color.red;
+    public GameObject damageVFXPrefab; // PREFAB PRE PARTIKLE (PRIDANÉ)
     private Color originalColor;
     private SpriteRenderer spriteRenderer;
     private Collider2D col;
@@ -50,23 +51,40 @@ public class EnemyHealth : MonoBehaviour
         {
             GameManager.instance.AddClick();
 
-            // Získame základné poškodenie
             float damageToDeal = GameManager.instance.clickDamage;
+            bool isCrit = false; // Pomocná premenná pre Crit
 
             // LOGIKA PRE KRITICKÝ ZÁSAH
             float roll = Random.Range(0f, 100f);
             if (roll <= GameManager.instance.critChance)
             {
                 damageToDeal *= GameManager.instance.critMultiplier;
+                isCrit = true;
                 Debug.Log("<color=yellow>CRITICAL HIT!</color> Poškodenie: " + damageToDeal);
             }
 
-            // Nahlásenie finálneho poškodenia do štatistík
             GameManager.instance.AddDamageStat(damageToDeal);
 
             TakeDamage(damageToDeal);
-            SpawnDamagePopup(damageToDeal);
+
+            // SPUSTÍME VFX NA MIESTE MYŠI
+            SpawnVFXAtMouse();
+
+            // POŠLEME INFORMÁCIU O CRITE AJ DO TEXTU
+            SpawnDamagePopup(damageToDeal, isCrit);
         }
+    }
+
+    // NOVÁ FUNKCIA PRE SPAWN PARTIKLOV POD MYŠOU
+    public void SpawnVFXAtMouse()
+    {
+        if (damageVFXPrefab == null) return;
+
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = 10f; // Nastav Z podľa hĺbky tvojej scény
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
+
+        Instantiate(damageVFXPrefab, worldPos, Quaternion.identity);
     }
 
     public void TakeDamage(float amount)
@@ -82,7 +100,6 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    // TÚTO FUNKCIU VOLÁ GAMEMANAGER
     public void ResetEnemy()
     {
         isDead = false;
@@ -100,14 +117,28 @@ public class EnemyHealth : MonoBehaviour
         Debug.Log("Medúsa bola úspešne oživená cez ResetEnemy!");
     }
 
-    void SpawnDamagePopup(float amount)
+    // UPRAVENÁ FUNKCIA PRE DAMAGE POPUP
+    void SpawnDamagePopup(float amount, bool isCrit)
     {
         if (damageTextPrefab != null && canvasTransform != null)
         {
             Vector3 spawnPos = Camera.main.WorldToScreenPoint(transform.position);
             GameObject textObj = Instantiate(damageTextPrefab, spawnPos, Quaternion.identity, canvasTransform);
 
-            textObj.GetComponent<TMPro.TextMeshProUGUI>().text = "-" + amount.ToString("F1");
+            var textMesh = textObj.GetComponent<TMPro.TextMeshProUGUI>();
+
+            // Ak je to Crit, zmeň farbu na žltú a pridaj vykričník
+            if (isCrit)
+            {
+                textMesh.color = Color.yellow;
+                textMesh.text = "-" + GameManager.instance.FormatNumbers(amount) + "!";
+                textMesh.fontSize *= 1.2f; // Trochu zväčšíme crit text
+            }
+            else
+            {
+                textMesh.text = "-" + GameManager.instance.FormatNumbers(amount);
+            }
+
             Destroy(textObj, 1f);
         }
     }
@@ -127,11 +158,9 @@ public class EnemyHealth : MonoBehaviour
         if (GameManager.instance != null)
         {
             GameManager.instance.AddKill(coinReward);
-            // HLAVNÁ ZMENA: Žiadosť o respawn posielame manageru
             GameManager.instance.RequestRespawn(this.gameObject, respawnTime);
         }
 
-        // Skryjeme nepriateľa
         spriteRenderer.enabled = false;
         if (col != null) col.enabled = false;
         if (healthSlider != null) healthSlider.gameObject.SetActive(false);
