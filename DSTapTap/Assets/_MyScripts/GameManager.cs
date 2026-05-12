@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviour
     public int totalCoinsSpent = 0;
     public float totalDamageDone = 0f;
 
+    [Header("Typ Nepriateľa")]
+    [Tooltip("0 = Medúza, 1 = Ork")]
+    public int currentEnemyType = 0;
+
     [Header("Boss Systém")]
     public int killsToBoss = 10;
     public int currentKills = 0;
@@ -106,15 +110,17 @@ public class GameManager : MonoBehaviour
     {
         monstersKilled++;
 
-        // Výpočet odmeny (multiplier už môže byť aplikovaný v baseReward ak ide o Bossa)
         int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier);
         coins += finalReward;
         totalCoinsEarned += finalReward;
 
+        // --- STRIEDANIE NEPRIATEĽOV ---
+        // Po každom zabití náhodne vyberieme, či ďalší bude Ork (1) alebo Medúza (0)
+        currentEnemyType = Random.Range(0, 2);
+
         // --- BOSS LOGIKA ---
         if (nextIsBoss)
         {
-            // Ak sme práve zabili bossa, vynulujeme progres
             currentKills = 0;
             nextIsBoss = false;
         }
@@ -136,10 +142,7 @@ public class GameManager : MonoBehaviour
         if (bossProgressText != null)
         {
             bossProgressText.text = currentKills + " / " + killsToBoss;
-
-            // Ak je pripravený boss, zafarbíme text na červeno
             bossProgressText.color = nextIsBoss ? Color.red : Color.white;
-
             if (nextIsBoss) bossProgressText.text = "BOSS READY!";
         }
     }
