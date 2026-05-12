@@ -4,7 +4,6 @@ using System.Collections;
 
 public class EnemyHealth : MonoBehaviour
 {
-    // --- ATRIBÚTY PATRIA SEM (NA ZAČIATOK TRIEDY) ---
     [Header("Vizuály Nepriateľov")]
     public Sprite medusaSprite;
     public Sprite orcSprite;
@@ -39,9 +38,11 @@ public class EnemyHealth : MonoBehaviour
     private bool isBoss = false;
     private bool isDead = false;
 
+    // Ochrana proti zaseknutiu farby pri rýchlom klikaní
+    private bool isFlashing = false;
+
     void Awake()
     {
-        // Tu inicializujeme komponenty
         spriteRenderer = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
         anim = GetComponent<Animator>();
@@ -56,8 +57,6 @@ public class EnemyHealth : MonoBehaviour
 
     void Start()
     {
-        // V Start() NESMÚ byť žiadne [Header] ani [SerializeField]!
-        // Iba voláme funkcie.
         ResetEnemy();
     }
 
@@ -85,18 +84,26 @@ public class EnemyHealth : MonoBehaviour
     {
         currentHealth -= amount;
         if (healthSlider != null) healthSlider.value = currentHealth;
+
+        // Spustenie bliknutia
         StartCoroutine(FlashEffect());
+
         if (currentHealth <= 0) Die();
     }
 
     public void ResetEnemy()
     {
         isDead = false;
+        isFlashing = false; // Reset blikania pri novom nepriateľovi
+
         if (bossTimerCoroutine != null) StopCoroutine(bossTimerCoroutine);
 
         if (GameManager.instance != null)
         {
-            // Logika vizuálu
+            // Reset farby na pôvodnú (bielu)
+            if (spriteRenderer != null) spriteRenderer.color = originalColor;
+
+            // Logika vizuálu (Medúza vs Ork)
             if (GameManager.instance.currentEnemyType == 1)
             {
                 if (spriteRenderer != null) spriteRenderer.sprite = orcSprite;
@@ -129,7 +136,7 @@ public class EnemyHealth : MonoBehaviour
                 currentHealth = baseMaxHealth;
                 coinReward = baseCoinReward;
                 transform.localScale = originalScale;
-                if (spriteRenderer != null) spriteRenderer.color = Color.white;
+                // Tu už neprepíšeme farbu na bielu, ak sme ju nastavili v Awake
             }
         }
 
@@ -182,11 +189,17 @@ public class EnemyHealth : MonoBehaviour
 
     IEnumerator FlashEffect()
     {
-        if (spriteRenderer == null) yield break;
-        Color oldColor = spriteRenderer.color;
+        // Ak už blikáme, nepúšťaj ďalšie blikanie (zamedzí zaseknutiu farby)
+        if (spriteRenderer == null || isFlashing) yield break;
+
+        isFlashing = true;
         spriteRenderer.color = damageColor;
+
         yield return new WaitForSeconds(0.1f);
-        spriteRenderer.color = oldColor;
+
+        // Vráti farbu na pôvodnú uloženú v Awake
+        spriteRenderer.color = isBoss ? new Color(1f, 0.6f, 0.6f) : originalColor;
+        isFlashing = false;
     }
 
     void SpawnVFXAtMouse(bool isCrit)
