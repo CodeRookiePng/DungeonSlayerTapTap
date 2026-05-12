@@ -10,7 +10,6 @@ public class EnemyHealth : MonoBehaviour
     public float respawnTime = 0.3f;
     public int coinReward = 15;
 
-    // Pomocné premenné na uloženie pôvodných hodnôt
     private float baseMaxHealth;
     private int baseCoinReward;
     private Vector3 originalScale;
@@ -22,8 +21,8 @@ public class EnemyHealth : MonoBehaviour
 
     [Header("Vizuálne Efekty")]
     public Color damageColor = Color.red;
-    public GameObject damageVFXPrefab; // Základné iskry
-    public GameObject critDamageVFXPrefab; // Kritické iskry
+    public GameObject damageVFXPrefab;
+    public GameObject critDamageVFXPrefab;
     private Color originalColor;
     private SpriteRenderer spriteRenderer;
     private Collider2D col;
@@ -32,11 +31,14 @@ public class EnemyHealth : MonoBehaviour
     private float nextDamageTime = 0f;
     public float damageCooldown = 0.1f;
 
+    [Header("Boss Timer")]
+    private Coroutine bossTimerCoroutine;
+    private bool isBoss = false;
+
     private bool isDead = false;
 
     void Start()
     {
-        // Uložíme si základné hodnoty hneď na začiatku
         baseMaxHealth = maxHealth;
         baseCoinReward = coinReward;
         originalScale = transform.localScale;
@@ -61,27 +63,18 @@ public class EnemyHealth : MonoBehaviour
         if (GameManager.instance != null)
         {
             GameManager.instance.AddClick();
-
             float damageToDeal = GameManager.instance.clickDamage;
             bool isCrit = false;
 
-            // LOGIKA PRE KRITICKÝ ZÁSAH
-            float roll = Random.Range(0f, 100f);
-            if (roll <= GameManager.instance.critChance)
+            if (Random.Range(0f, 100f) <= GameManager.instance.critChance)
             {
                 damageToDeal *= GameManager.instance.critMultiplier;
                 isCrit = true;
-                Debug.Log("<color=yellow>CRITICAL HIT!</color> Poškodenie: " + damageToDeal);
             }
 
             GameManager.instance.AddDamageStat(damageToDeal);
-
             TakeDamage(damageToDeal);
-
-            // SPUSTÍME VFX (posielame info, či je to crit)
             SpawnVFXAtMouse(isCrit);
-
-            // POŠLEME INFORMÁCIU O CRITE AJ DO TEXTU
             SpawnDamagePopup(damageToDeal, isCrit);
         }
     }
@@ -89,7 +82,6 @@ public class EnemyHealth : MonoBehaviour
     public void SpawnVFXAtMouse(bool isCrit)
     {
         GameObject vfxToSpawn = isCrit ? critDamageVFXPrefab : damageVFXPrefab;
-
         if (vfxToSpawn == null) return;
 
         Vector3 mousePos = Input.mousePosition;
@@ -107,38 +99,36 @@ public class EnemyHealth : MonoBehaviour
 
         StartCoroutine(FlashEffect());
 
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        if (currentHealth <= 0) Die();
     }
 
-    // UPRAVENÝ RESET PRE BOSS SYSTÉM
     public void ResetEnemy()
     {
         isDead = false;
 
-        // Skontrolujeme v Manageri, či má byť ďalší nepriateľ BOSS
+        if (bossTimerCoroutine != null) StopCoroutine(bossTimerCoroutine);
+
         if (GameManager.instance != null && GameManager.instance.nextIsBoss)
         {
+            isBoss = true;
             maxHealth = baseMaxHealth * 5f;
             coinReward = baseCoinReward * 10;
             transform.localScale = originalScale * 1.3f;
-            spriteRenderer.color = new Color(1f, 0.6f, 0.6f); // Jemný červený nádych pre Bossa
-            Debug.Log("<color=red>POZOR: BOSS MEDÚZA SA OBJAVILA!</color>");
+            spriteRenderer.color = new Color(1f, 0.6f, 0.6f);
+
+            // Spustíme vylepšený časovač
+            bossTimerCoroutine = StartCoroutine(BossTimer(GameManager.instance.bossTimeLimit));
         }
         else
         {
-            // Návrat k bežným štatistikám
+            isBoss = false;
             maxHealth = baseMaxHealth;
             coinReward = baseCoinReward;
             transform.localScale = originalScale;
-            spriteRenderer.color = new Color(1f, 1f, 1f); // Návrat k čistej bielej
+            spriteRenderer.color = new Color(1f, 1f, 1f);
         }
 
-        // --- DÔLEŽITÁ OPRAVA FARBY ---
         originalColor = spriteRenderer.color;
-
         currentHealth = maxHealth;
 
         if (healthSlider != null)
@@ -152,13 +142,35 @@ public class EnemyHealth : MonoBehaviour
         if (col != null) col.enabled = true;
     }
 
+    // --- VYLEPŠENÝ ČASOVAČ S ODPOČTOM ---
+    private IEnumerator BossTimer(float timeLimit)
+    {
+        float timeLeft = timeLimit;
+
+        while (timeLeft > 0)
+        {
+            if (GameManager.instance != null && GameManager.instance.bossProgressText != null)
+            {
+                // Aktualizujeme UI text každú desatinu sekundy
+                GameManager.instance.bossProgressText.text = "TIME: " + timeLeft.ToString("F1") + "s";
+            }
+
+            yield return new WaitForSeconds(0.1f);
+            timeLeft -= 0.1f;
+        }
+
+        if (!isDead && isBoss)
+        {
+            GameManager.instance.BossFailed(this.gameObject);
+        }
+    }
+
     void SpawnDamagePopup(float amount, bool isCrit)
     {
         if (damageTextPrefab != null && canvasTransform != null)
         {
             Vector3 spawnPos = Camera.main.WorldToScreenPoint(transform.position);
             GameObject textObj = Instantiate(damageTextPrefab, spawnPos, Quaternion.identity, canvasTransform);
-
             var textMesh = textObj.GetComponent<TMPro.TextMeshProUGUI>();
 
             if (isCrit)
@@ -188,9 +200,10 @@ public class EnemyHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
+        if (bossTimerCoroutine != null) StopCoroutine(bossTimerCoroutine);
+
         if (GameManager.instance != null)
         {
-            // Managerovi povieme o odmene
             GameManager.instance.AddKill(coinReward);
             GameManager.instance.RequestRespawn(this.gameObject, respawnTime);
         }

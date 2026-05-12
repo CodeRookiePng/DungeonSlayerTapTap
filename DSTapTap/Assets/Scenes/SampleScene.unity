@@ -2488,6 +2488,7 @@ MonoBehaviour:
   currentKills: 0
   bossProgressText: {fileID: 942975478}
   nextIsBoss: 0
+  bossTimeLimit: 15
   coinText: {fileID: 363419713}
   statsClickText: {fileID: 248652989}
   statsKilledText: {fileID: 1011635915}
