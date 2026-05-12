@@ -14,6 +14,12 @@ public class GameManager : MonoBehaviour
     public int totalCoinsSpent = 0;
     public float totalDamageDone = 0f;
 
+    [Header("Boss Systém")]
+    public int killsToBoss = 10;
+    public int currentKills = 0;
+    public TextMeshProUGUI bossProgressText;
+    public bool nextIsBoss = false;
+
     [Header("UI Texty - Štatistiky")]
     public TextMeshProUGUI coinText;
     public TextMeshProUGUI statsClickText;
@@ -59,9 +65,10 @@ public class GameManager : MonoBehaviour
         UpdateUI();
         if (statsPanel != null) statsPanel.SetActive(false);
         StartCoroutine(GoldMineRoutine());
+        UpdateBossUI(); // Inicializácia textu 0/10
     }
 
-    // --- GOLD MINE LOGIKA (UPRAVENÁ) ---
+    // --- GOLD MINE LOGIKA ---
     private IEnumerator GoldMineRoutine()
     {
         while (true)
@@ -69,16 +76,12 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(mineInterval);
             if (mineLevel > 0)
             {
-                // Najprv vypočítame základ podľa levelu bane
                 float baseReward = mineBaseReward * Mathf.Pow(2.2f, mineLevel - 1);
-
-                // TERAZ aplikujeme coinMultiplier
                 int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier);
 
                 coins += finalReward;
                 totalCoinsEarned += finalReward;
                 UpdateUI();
-                Debug.Log("Baňa vyprodukovala: " + finalReward + " (Multiplier: " + coinMultiplier + "x)");
             }
         }
     }
@@ -102,10 +105,43 @@ public class GameManager : MonoBehaviour
     public void AddKill(int baseReward)
     {
         monstersKilled++;
+
+        // Výpočet odmeny (multiplier už môže byť aplikovaný v baseReward ak ide o Bossa)
         int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier);
         coins += finalReward;
         totalCoinsEarned += finalReward;
+
+        // --- BOSS LOGIKA ---
+        if (nextIsBoss)
+        {
+            // Ak sme práve zabili bossa, vynulujeme progres
+            currentKills = 0;
+            nextIsBoss = false;
+        }
+        else
+        {
+            currentKills++;
+            if (currentKills >= killsToBoss)
+            {
+                nextIsBoss = true;
+            }
+        }
+
+        UpdateBossUI();
         UpdateUI();
+    }
+
+    void UpdateBossUI()
+    {
+        if (bossProgressText != null)
+        {
+            bossProgressText.text = currentKills + " / " + killsToBoss;
+
+            // Ak je pripravený boss, zafarbíme text na červeno
+            bossProgressText.color = nextIsBoss ? Color.red : Color.white;
+
+            if (nextIsBoss) bossProgressText.text = "BOSS READY!";
+        }
     }
 
     // --- UPGRADY ---
@@ -169,43 +205,30 @@ public class GameManager : MonoBehaviour
 
     public void UpdateUI()
     {
-        // POUŽITIE FORMÁTU PRE HLAVNÝ TEXT MINCÍ
         if (coinText != null) coinText.text = FormatNumbers(coins);
 
-        // FORMÁT PRE ŠTATISTIKY V PANELI
         if (statsClickText != null) statsClickText.text = "Total Clicks: " + FormatNumbers(totalClicks);
         if (statsKilledText != null) statsKilledText.text = "Monsters Killed: " + FormatNumbers(monstersKilled);
         if (statsEarnedText != null) statsEarnedText.text = "Total Earned: " + FormatNumbers(totalCoinsEarned);
         if (statsSpentText != null) statsSpentText.text = "Total Spent: " + FormatNumbers(totalCoinsSpent);
         if (statsDamageText != null) statsDamageText.text = "Total Damage: " + FormatNumbers(totalDamageDone);
 
-        // FORMÁT PRE CENY UPGRADOV
         if (mineUpgradePriceText != null) mineUpgradePriceText.text = "Price: " + FormatNumbers(mineUpgradePrice);
         if (upgradePriceText != null) upgradePriceText.text = "Price: " + FormatNumbers(upgradePrice);
         if (coinUpgradePriceText != null) coinUpgradePriceText.text = "Price: " + FormatNumbers(coinUpgradePrice);
         if (critUpgradePriceText != null) critUpgradePriceText.text = "Price: " + FormatNumbers(critUpgradePrice);
 
-        // FORMÁT PRE STATUS BANE
         if (mineStatusText != null)
         {
             float currentProd = (mineLevel == 0) ? 0 : (mineBaseReward * Mathf.Pow(2.2f, mineLevel - 1)) * coinMultiplier;
-            // Tu zmeníme text na skrátený formát
             mineStatusText.text = FormatNumbers(currentProd) + " / 3s";
         }
     }
 
-    // Táto funkcia zmení veľké čísla na formát 1.2k, 5.5M atď.
     public string FormatNumbers(float value)
     {
-        if (value >= 1000000)
-        {
-            return (value / 1000000f).ToString("F2") + "M";
-        }
-        if (value >= 1000)
-        {
-            return (value / 1000f).ToString("F1") + "k";
-        }
-
+        if (value >= 1000000) return (value / 1000000f).ToString("F2") + "M";
+        if (value >= 1000) return (value / 1000f).ToString("F1") + "k";
         return value.ToString("F0");
     }
-}   
+}
