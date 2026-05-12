@@ -4,20 +4,17 @@ using System.Collections;
 
 public class EnemyHealth : MonoBehaviour
 {
+    // --- ATRIBÚTY PATRIA SEM (NA ZAČIATOK TRIEDY) ---
     [Header("Vizuály Nepriateľov")]
-    public Sprite medusaSprite;    // Tu vlož obrázok medúzy
-    public Sprite orcSprite;       // Tu vlož obrázok orka
-    public RuntimeAnimatorController medusaAnimator; // Tu vlož Animator pre medúzu
+    public Sprite medusaSprite;
+    public Sprite orcSprite;
+    public RuntimeAnimatorController medusaAnimator;
 
     [Header("Nastavenia")]
     public float maxHealth = 150f;
     private float currentHealth;
     public float respawnTime = 0.3f;
     public int coinReward = 15;
-
-    private float baseMaxHealth;
-    private int baseCoinReward;
-    private Vector3 originalScale;
 
     [Header("UI a Efekty")]
     public Slider healthSlider;
@@ -27,35 +24,54 @@ public class EnemyHealth : MonoBehaviour
     public GameObject damageVFXPrefab;
     public GameObject critDamageVFXPrefab;
 
+    [Header("Nastavenia Klikania")]
+    public float damageCooldown = 0.1f;
+    private float nextDamageTime = 0f;
+
+    private float baseMaxHealth;
+    private int baseCoinReward;
+    private Vector3 originalScale;
     private SpriteRenderer spriteRenderer;
     private Collider2D col;
     private Animator anim;
+    private Color originalColor;
+    private Coroutine bossTimerCoroutine;
+    private bool isBoss = false;
     private bool isDead = false;
 
     void Awake()
     {
+        // Tu inicializujeme komponenty
         spriteRenderer = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
         anim = GetComponent<Animator>();
+
         baseMaxHealth = maxHealth;
         baseCoinReward = coinReward;
         originalScale = transform.localScale;
+
+        if (spriteRenderer != null)
+            originalColor = spriteRenderer.color;
     }
 
     void Start()
     {
+        // V Start() NESMÚ byť žiadne [Header] ani [SerializeField]!
+        // Iba voláme funkcie.
         ResetEnemy();
     }
 
     void OnMouseDown()
     {
-        if (isDead) return;
+        if (isDead || Time.time < nextDamageTime) return;
+        nextDamageTime = Time.time + damageCooldown;
 
         if (GameManager.instance != null)
         {
             GameManager.instance.AddClick();
             float damageToDeal = GameManager.instance.clickDamage;
             bool isCrit = Random.Range(0f, 100f) <= GameManager.instance.critChance;
+
             if (isCrit) damageToDeal *= GameManager.instance.critMultiplier;
 
             GameManager.instance.AddDamageStat(damageToDeal);
@@ -76,38 +92,44 @@ public class EnemyHealth : MonoBehaviour
     public void ResetEnemy()
     {
         isDead = false;
+        if (bossTimerCoroutine != null) StopCoroutine(bossTimerCoroutine);
 
         if (GameManager.instance != null)
         {
-            // Logika striedania (0 = Medúza, 1 = Ork)
+            // Logika vizuálu
             if (GameManager.instance.currentEnemyType == 1)
             {
-                spriteRenderer.sprite = orcSprite;
-                if (anim != null) anim.enabled = false; // Ork nemá animáciu, tak ju vypneme
+                if (spriteRenderer != null) spriteRenderer.sprite = orcSprite;
+                if (anim != null) anim.enabled = false;
             }
             else
             {
-                spriteRenderer.sprite = medusaSprite;
+                if (spriteRenderer != null) spriteRenderer.sprite = medusaSprite;
                 if (anim != null)
                 {
                     anim.enabled = true;
                     anim.runtimeAnimatorController = medusaAnimator;
-                    anim.Rebind(); // Toto reštartuje animáciu, aby nezamrzla
+                    anim.Rebind();
                 }
             }
 
-            // Nastavenie štatistík (Boss vs Normal)
+            // Boss nastavenia
             if (GameManager.instance.nextIsBoss)
             {
-                currentHealth = maxHealth * 5f;
+                isBoss = true;
+                currentHealth = baseMaxHealth * 5f;
+                coinReward = baseCoinReward * 10;
                 transform.localScale = originalScale * 1.3f;
-                spriteRenderer.color = new Color(1f, 0.6f, 0.6f);
+                if (spriteRenderer != null) spriteRenderer.color = new Color(1f, 0.6f, 0.6f);
+                bossTimerCoroutine = StartCoroutine(BossTimer(GameManager.instance.bossTimeLimit));
             }
             else
             {
-                currentHealth = maxHealth;
+                isBoss = false;
+                currentHealth = baseMaxHealth;
+                coinReward = baseCoinReward;
                 transform.localScale = originalScale;
-                spriteRenderer.color = Color.white;
+                if (spriteRenderer != null) spriteRenderer.color = Color.white;
             }
         }
 
@@ -118,14 +140,34 @@ public class EnemyHealth : MonoBehaviour
             healthSlider.gameObject.SetActive(true);
         }
 
-        spriteRenderer.enabled = true;
+        if (spriteRenderer != null) spriteRenderer.enabled = true;
         if (col != null) col.enabled = true;
+    }
+
+    private IEnumerator BossTimer(float timeLimit)
+    {
+        float timeLeft = timeLimit;
+        while (timeLeft > 0)
+        {
+            if (GameManager.instance != null && GameManager.instance.bossProgressText != null)
+            {
+                GameManager.instance.bossProgressText.text = "TIME: " + timeLeft.ToString("F1") + "s";
+            }
+            yield return new WaitForSeconds(0.1f);
+            timeLeft -= 0.1f;
+        }
+
+        if (!isDead && isBoss)
+        {
+            GameManager.instance.BossFailed(this.gameObject);
+        }
     }
 
     void Die()
     {
         if (isDead) return;
         isDead = true;
+        if (bossTimerCoroutine != null) StopCoroutine(bossTimerCoroutine);
 
         if (GameManager.instance != null)
         {
@@ -133,14 +175,14 @@ public class EnemyHealth : MonoBehaviour
             GameManager.instance.RequestRespawn(this.gameObject, respawnTime);
         }
 
-        spriteRenderer.enabled = false;
+        if (spriteRenderer != null) spriteRenderer.enabled = false;
         if (col != null) col.enabled = false;
         if (healthSlider != null) healthSlider.gameObject.SetActive(false);
     }
 
-    // --- Pomocné funkcie pre vizuál ---
     IEnumerator FlashEffect()
     {
+        if (spriteRenderer == null) yield break;
         Color oldColor = spriteRenderer.color;
         spriteRenderer.color = damageColor;
         yield return new WaitForSeconds(0.1f);
@@ -162,8 +204,11 @@ public class EnemyHealth : MonoBehaviour
         Vector3 spawnPos = Camera.main.WorldToScreenPoint(transform.position);
         GameObject textObj = Instantiate(damageTextPrefab, spawnPos, Quaternion.identity, canvasTransform);
         var tm = textObj.GetComponent<TMPro.TextMeshProUGUI>();
-        tm.text = "-" + GameManager.instance.FormatNumbers(amount) + (isCrit ? "!" : "");
-        if (isCrit) tm.color = Color.yellow;
+        if (tm != null)
+        {
+            tm.text = "-" + GameManager.instance.FormatNumbers(amount) + (isCrit ? "!" : "");
+            if (isCrit) tm.color = Color.yellow;
+        }
         Destroy(textObj, 1f);
     }
 }

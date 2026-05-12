@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     public int currentKills = 0;
     public TextMeshProUGUI bossProgressText;
     public bool nextIsBoss = false;
+    public float bossTimeLimit = 15f;
 
     [Header("UI Texty - Štatistiky")]
     public TextMeshProUGUI coinText;
@@ -69,10 +70,9 @@ public class GameManager : MonoBehaviour
         UpdateUI();
         if (statsPanel != null) statsPanel.SetActive(false);
         StartCoroutine(GoldMineRoutine());
-        UpdateBossUI(); // Inicializácia textu 0/10
+        UpdateBossUI();
     }
 
-    // --- GOLD MINE LOGIKA ---
     private IEnumerator GoldMineRoutine()
     {
         while (true)
@@ -82,7 +82,6 @@ public class GameManager : MonoBehaviour
             {
                 float baseReward = mineBaseReward * Mathf.Pow(2.2f, mineLevel - 1);
                 int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier);
-
                 coins += finalReward;
                 totalCoinsEarned += finalReward;
                 UpdateUI();
@@ -102,23 +101,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // --- LOGIKA HRY ---
     public void AddClick() { totalClicks++; UpdateUI(); }
     public void AddDamageStat(float amount) { totalDamageDone += amount; UpdateUI(); }
 
     public void AddKill(int baseReward)
     {
         monstersKilled++;
-
         int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier);
         coins += finalReward;
         totalCoinsEarned += finalReward;
 
-        // --- STRIEDANIE NEPRIATEĽOV ---
-        // Po každom zabití náhodne vyberieme, či ďalší bude Ork (1) alebo Medúza (0)
+        // Oprava: Odstránené značky
         currentEnemyType = Random.Range(0, 2);
 
-        // --- BOSS LOGIKA ---
         if (nextIsBoss)
         {
             currentKills = 0;
@@ -137,17 +132,36 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
-    void UpdateBossUI()
+    public void BossFailed(GameObject boss)
     {
-        if (bossProgressText != null)
+        currentKills = 0;
+        nextIsBoss = false;
+        UpdateBossUI();
+
+        if (boss != null)
         {
-            bossProgressText.text = currentKills + " / " + killsToBoss;
-            bossProgressText.color = nextIsBoss ? Color.red : Color.white;
-            if (nextIsBoss) bossProgressText.text = "BOSS READY!";
+            var healthScript = boss.GetComponent<EnemyHealth>();
+            if (healthScript != null) healthScript.ResetEnemy();
         }
     }
 
-    // --- UPGRADY ---
+    public void UpdateBossUI()
+    {
+        if (bossProgressText != null)
+        {
+            if (nextIsBoss)
+            {
+                bossProgressText.text = "BOSS READY!";
+                bossProgressText.color = Color.red;
+            }
+            else
+            {
+                bossProgressText.text = currentKills + " / " + killsToBoss;
+                bossProgressText.color = Color.white;
+            }
+        }
+    }
+
     public void UpgradeDamage()
     {
         if (coins >= upgradePrice)
@@ -184,7 +198,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // --- RESPANN LOGIKA ---
     public void RequestRespawn(GameObject entity, float delay)
     {
         StartCoroutine(HandleRespawn(entity, delay));
@@ -200,7 +213,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // --- UI ---
     public void ToggleStats()
     {
         if (statsPanel != null) { statsPanel.SetActive(!statsPanel.activeSelf); UpdateUI(); }
@@ -209,7 +221,6 @@ public class GameManager : MonoBehaviour
     public void UpdateUI()
     {
         if (coinText != null) coinText.text = FormatNumbers(coins);
-
         if (statsClickText != null) statsClickText.text = "Total Clicks: " + FormatNumbers(totalClicks);
         if (statsKilledText != null) statsKilledText.text = "Monsters Killed: " + FormatNumbers(monstersKilled);
         if (statsEarnedText != null) statsEarnedText.text = "Total Earned: " + FormatNumbers(totalCoinsEarned);
@@ -224,7 +235,7 @@ public class GameManager : MonoBehaviour
         if (mineStatusText != null)
         {
             float currentProd = (mineLevel == 0) ? 0 : (mineBaseReward * Mathf.Pow(2.2f, mineLevel - 1)) * coinMultiplier;
-            mineStatusText.text = FormatNumbers(currentProd) + " / 3s";
+            mineStatusText.text = FormatNumbers(currentProd) + " / " + mineInterval + "s";
         }
     }
 
