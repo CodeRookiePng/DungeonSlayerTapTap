@@ -2055,6 +2055,10 @@ PrefabInstance:
       value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 7140871198683382473, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
+      propertyPath: orcSprite
+      value: 
+      objectReference: {fileID: -4831997116911646024, guid: 407e4ba87df60214b8b441d4580d8b0c, type: 3}
+    - target: {fileID: 7140871198683382473, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
       propertyPath: coinReward
       value: 15
       objectReference: {fileID: 0}
@@ -2067,9 +2071,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2082240671}
     - target: {fileID: 7140871198683382473, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
+      propertyPath: medusaSprite
+      value: 
+      objectReference: {fileID: 2260757919805402200, guid: 4da9a790a850a054daf45c4a62a2f14c, type: 3}
+    - target: {fileID: 7140871198683382473, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
       propertyPath: damageCooldown
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7140871198683382473, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
+      propertyPath: medusaAnimator
+      value: 
+      objectReference: {fileID: 9100000, guid: b44220bf01330c147b93e3eedfac67f7, type: 2}
     - target: {fileID: 7140871198683382473, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
       propertyPath: canvasTransform
       value: 
@@ -2089,7 +2101,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3913323441554950205, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1823098746}
   m_SourcePrefab: {fileID: 100100000, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
 --- !u!1 &519420028
 GameObject:
@@ -2484,6 +2499,7 @@ MonoBehaviour:
   totalCoinsEarned: 0
   totalCoinsSpent: 0
   totalDamageDone: 0
+  currentEnemyType: 0
   killsToBoss: 10
   currentKills: 0
   bossProgressText: {fileID: 942975478}
@@ -4701,6 +4717,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1734854051}
   m_CullTransparentMesh: 1
+--- !u!1 &1823098742 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3913323441554950205, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
+  m_PrefabInstance: {fileID: 508503817}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1823098746
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1823098742}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b44220bf01330c147b93e3eedfac67f7, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1828759549
 GameObject:
   m_ObjectHideFlags: 0
