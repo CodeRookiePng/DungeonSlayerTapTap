@@ -2093,7 +2093,7 @@ PrefabInstance:
     - target: {fileID: 7140871198683382473, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
       propertyPath: damageTextPrefab
       value: 
-      objectReference: {fileID: 8845495722786497027, guid: f48c901b959abfd48a0d048a81037468, type: 3}
+      objectReference: {fileID: 6239990029539754213, guid: 31448d6231b41454d82894a7016dd91e, type: 3}
     - target: {fileID: 7140871198683382473, guid: 38e1e0e98d2ce1c49ab87dd8b1bb4a15, type: 3}
       propertyPath: critDamageVFXPrefab
       value: 
