@@ -13,6 +13,12 @@ public class GameManager : MonoBehaviour
     public int totalCoinsEarned = 0;
     public int totalCoinsSpent = 0;
     public float totalDamageDone = 0f;
+    public int totalGemsEarned = 0; // NOVÉ: Sledovanie celkovo získaných drahokamov
+
+    [Header("Herná Mena - Gems")]
+    public int gems = 0; // NOVÉ: Aktuálny stav drahokamov
+    public TextMeshProUGUI gemsText; // NOVÉ: Referencia na textové UI pre drahokamy
+    public TextMeshProUGUI statsGemsText; // NOVÉ: Text do panelu štatistík
 
     [Header("Typ Nepriateľa")]
     [Tooltip("0 = Medúza, 1 = Ork")]
@@ -104,6 +110,14 @@ public class GameManager : MonoBehaviour
     public void AddClick() { totalClicks++; UpdateUI(); }
     public void AddDamageStat(float amount) { totalDamageDone += amount; UpdateUI(); }
 
+    // NOVÉ: Pomocná metóda na pridanie drahokamov (využijeme ju aj neskôr)
+    public void AddGems(int amount)
+    {
+        gems += amount;
+        totalGemsEarned += amount;
+        UpdateUI();
+    }
+
     public void AddKill(int baseReward)
     {
         monstersKilled++;
@@ -111,11 +125,18 @@ public class GameManager : MonoBehaviour
         coins += finalReward;
         totalCoinsEarned += finalReward;
 
-        // Oprava: Odstránené značky
         currentEnemyType = Random.Range(0, 2);
 
         if (nextIsBoss)
         {
+            // NOVÉ: Logika pre drop drahokamu z bossa s 1% šancou
+            int sanca = Random.Range(1, 101); // Kocka od 1 do 100
+            if (sanca <= 5)
+            {
+                AddGems(1);
+                Debug.Log("<Color=Cyan>Skvelé! Z bossa vypadol vzácny Gem (5% šanca)!</Color>");
+            }
+
             currentKills = 0;
             nextIsBoss = false;
         }
@@ -221,11 +242,15 @@ public class GameManager : MonoBehaviour
     public void UpdateUI()
     {
         if (coinText != null) coinText.text = FormatNumbers(coins);
+        if (gemsText != null) gemsText.text = FormatNumbers(gems); // NOVÉ: Zobrazenie aktuálnych drahokamov
+
+        // Aktualizácia štatistického panelu
         if (statsClickText != null) statsClickText.text = "Total Clicks: " + FormatNumbers(totalClicks);
         if (statsKilledText != null) statsKilledText.text = "Monsters Killed: " + FormatNumbers(monstersKilled);
         if (statsEarnedText != null) statsEarnedText.text = "Total Earned: " + FormatNumbers(totalCoinsEarned);
         if (statsSpentText != null) statsSpentText.text = "Total Spent: " + FormatNumbers(totalCoinsSpent);
         if (statsDamageText != null) statsDamageText.text = "Total Damage: " + FormatNumbers(totalDamageDone);
+        if (statsGemsText != null) statsGemsText.text = "Total Gems: " + FormatNumbers(totalGemsEarned); // NOVÉ: Štatistika drahokamov
 
         if (mineUpgradePriceText != null) mineUpgradePriceText.text = "Price: " + FormatNumbers(mineUpgradePrice);
         if (upgradePriceText != null) upgradePriceText.text = "Price: " + FormatNumbers(upgradePrice);
