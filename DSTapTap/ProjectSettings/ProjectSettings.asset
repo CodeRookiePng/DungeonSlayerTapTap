@@ -872,11 +872,11 @@ PlayerSettings:
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
   enableDirectStorage: 0
-  cloudProjectId: 59e40b6b-51d6-43b2-85c9-2fd2ae8efbad
+  cloudProjectId: f730198a-b9fa-4b7f-b25c-a6acdf68d9e2
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: DSTapTap
-  organizationId: jaroslav123
+  projectName: My project
+  organizationId: balejamarek7
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
