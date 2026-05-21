@@ -1,13 +1,17 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class EnemyHealth : MonoBehaviour
 {
     [Header("Vizuály Nepriateľov")]
     public Sprite medusaSprite;
-    public Sprite orcSprite;
     public RuntimeAnimatorController medusaAnimator;
+
+    [Header("Skriptová Animácia Orka")]
+    public List<Sprite> orcAnimationFrames;
+    public float animationSpeed = 0.1f;
 
     [Header("Nastavenia")]
     public float maxHealth = 150f;
@@ -34,11 +38,13 @@ public class EnemyHealth : MonoBehaviour
     private Collider2D col;
     private Animator anim;
     private Color originalColor;
+
     private Coroutine bossTimerCoroutine;
+    private float bossTimeLeft; // NOVÉ: Pamätá si zostávajúci čas bosa pri prepínaní obrazoviek
+
+    private Coroutine orcAnimationCoroutine;
     private bool isBoss = false;
     private bool isDead = false;
-
-    // Ochrana proti zaseknutiu farby pri rýchlom klikaní
     private bool isFlashing = false;
 
     void Awake()
@@ -58,6 +64,40 @@ public class EnemyHealth : MonoBehaviour
     void Start()
     {
         ResetEnemy();
+    }
+
+    void OnEnable()
+    {
+        // Reštart animácie Orka po návrate
+        if (GameManager.instance != null && GameManager.instance.currentEnemyType == 1 && !isDead)
+        {
+            if (orcAnimationCoroutine != null) StopCoroutine(orcAnimationCoroutine);
+            orcAnimationCoroutine = StartCoroutine(AnimateOrc());
+        }
+
+        // OPRAVA TIMERA: Ak bol nepriateľ boss a ešte nezomrel, po návrate z upgradov obnovíme timer tam, kde skončil
+        if (isBoss && !isDead && bossTimeLeft > 0)
+        {
+            if (bossTimerCoroutine != null) StopCoroutine(bossTimerCoroutine);
+            bossTimerCoroutine = StartCoroutine(BossTimer(bossTimeLeft));
+        }
+    }
+
+    void OnDisable()
+    {
+        // Bezpečne stopneme animáciu Orka
+        if (orcAnimationCoroutine != null)
+        {
+            StopCoroutine(orcAnimationCoroutine);
+            orcAnimationCoroutine = null;
+        }
+
+        // OPRAVA TIMERA: Stopneme odpočítavanie bosa, ale čas (sekundy) necháme uložený v bossTimeLeft
+        if (bossTimerCoroutine != null)
+        {
+            StopCoroutine(bossTimerCoroutine);
+            bossTimerCoroutine = null;
+        }
     }
 
     void OnMouseDown()
@@ -85,7 +125,6 @@ public class EnemyHealth : MonoBehaviour
         currentHealth -= amount;
         if (healthSlider != null) healthSlider.value = currentHealth;
 
-        // Spustenie bliknutia
         StartCoroutine(FlashEffect());
 
         if (currentHealth <= 0) Die();
@@ -94,20 +133,19 @@ public class EnemyHealth : MonoBehaviour
     public void ResetEnemy()
     {
         isDead = false;
-        isFlashing = false; // Reset blikania pri novom nepriateľovi
+        isFlashing = false;
 
         if (bossTimerCoroutine != null) StopCoroutine(bossTimerCoroutine);
+        if (orcAnimationCoroutine != null) StopCoroutine(orcAnimationCoroutine);
 
         if (GameManager.instance != null)
         {
-            // Reset farby na pôvodnú (bielu)
             if (spriteRenderer != null) spriteRenderer.color = originalColor;
 
-            // Logika vizuálu (Medúza vs Ork)
             if (GameManager.instance.currentEnemyType == 1)
             {
-                if (spriteRenderer != null) spriteRenderer.sprite = orcSprite;
                 if (anim != null) anim.enabled = false;
+                orcAnimationCoroutine = StartCoroutine(AnimateOrc());
             }
             else
             {
@@ -128,7 +166,10 @@ public class EnemyHealth : MonoBehaviour
                 coinReward = baseCoinReward * 10;
                 transform.localScale = originalScale * 1.3f;
                 if (spriteRenderer != null) spriteRenderer.color = new Color(1f, 0.6f, 0.6f);
-                bossTimerCoroutine = StartCoroutine(BossTimer(GameManager.instance.bossTimeLimit));
+
+                // Pri úplne novom bossovi nastavíme plný čas zo správcu hry
+                bossTimeLeft = GameManager.instance.bossTimeLimit;
+                bossTimerCoroutine = StartCoroutine(BossTimer(bossTimeLeft));
             }
             else
             {
@@ -136,7 +177,7 @@ public class EnemyHealth : MonoBehaviour
                 currentHealth = baseMaxHealth;
                 coinReward = baseCoinReward;
                 transform.localScale = originalScale;
-                // Tu už neprepíšeme farbu na bielu, ak sme ju nastavili v Awake
+                bossTimeLeft = 0;
             }
         }
 
@@ -151,17 +192,35 @@ public class EnemyHealth : MonoBehaviour
         if (col != null) col.enabled = true;
     }
 
-    private IEnumerator BossTimer(float timeLimit)
+    private IEnumerator AnimateOrc()
     {
-        float timeLeft = timeLimit;
-        while (timeLeft > 0)
+        if (orcAnimationFrames == null || orcAnimationFrames.Count == 0) yield break;
+
+        int currentFrame = 0;
+        while (true)
+        {
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.sprite = orcAnimationFrames[currentFrame];
+            }
+
+            currentFrame = (currentFrame + 1) % orcAnimationFrames.Count;
+            yield return new WaitForSeconds(animationSpeed);
+        }
+    }
+
+    // UPRAVENÉ: Coroutine si plynule ukladá aktuálny čas do bossTimeLeft každé okienko (frame)
+    private IEnumerator BossTimer(float startTime)
+    {
+        bossTimeLeft = startTime;
+        while (bossTimeLeft > 0)
         {
             if (GameManager.instance != null && GameManager.instance.bossProgressText != null)
             {
-                GameManager.instance.bossProgressText.text = "TIME: " + timeLeft.ToString("F1") + "s";
+                GameManager.instance.bossProgressText.text = "TIME: " + bossTimeLeft.ToString("F1") + "s";
             }
-            yield return new WaitForSeconds(0.1f);
-            timeLeft -= 0.1f;
+            yield return null;
+            bossTimeLeft -= Time.deltaTime;
         }
 
         if (!isDead && isBoss)
@@ -175,6 +234,8 @@ public class EnemyHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
         if (bossTimerCoroutine != null) StopCoroutine(bossTimerCoroutine);
+        if (orcAnimationCoroutine != null) StopCoroutine(orcAnimationCoroutine);
+        bossTimeLeft = 0;
 
         if (GameManager.instance != null)
         {
@@ -189,7 +250,6 @@ public class EnemyHealth : MonoBehaviour
 
     IEnumerator FlashEffect()
     {
-        // Ak už blikáme, nepúšťaj ďalšie blikanie (zamedzí zaseknutiu farby)
         if (spriteRenderer == null || isFlashing) yield break;
 
         isFlashing = true;
@@ -197,7 +257,6 @@ public class EnemyHealth : MonoBehaviour
 
         yield return new WaitForSeconds(0.1f);
 
-        // Vráti farbu na pôvodnú uloženú v Awake
         spriteRenderer.color = isBoss ? new Color(1f, 0.6f, 0.6f) : originalColor;
         isFlashing = false;
     }
