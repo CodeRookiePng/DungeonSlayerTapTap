@@ -12,60 +12,44 @@ public class ShopIAPManager : MonoBehaviour
     public int gemsReward = 500;
     public int coinsReward = 7000;
 
-    [Header("Top Bar UI Text References")]
-    public TextMeshProUGUI totalGemsText;  // Sem pretiahneš text, ktorý ukazuje celkové Gemy hore na obrazovke
-    public TextMeshProUGUI totalCoinsText; // Sem pretiahneš text, ktorý ukazuje celkové Coiny hore na obrazovke
-
     void Start()
     {
         // 1. Spustíme odpočet na 5 dní
         remainingTime = new TimeSpan(5, 0, 0, 0);
         UpdateTimerText();
         InvokeRepeating(nameof(Countdown), 1f, 1f);
-
-        // 2. Načítame a zobrazíme aktuálne peniaze hneď po zapnutí hry
-        UpdateTopBarUI();
     }
 
+    // Zavolá sa z Unity IAP Buttonu po úspešnom zaplatení (On Order Confirmed)
     public void OnPurchaseComplete()
     {
-        Debug.Log("Nákup bol ÚSPEŠNÝ! Odmeňujem hráča.");
+        Debug.Log("IAP Shop: Nákup bol ÚSPEŠNÝ! Odmeňujem hráča cez GameManager.");
         GiveRewards();
     }
 
+    // Zavolá sa, ak nákup zlyhá (On Purchase Failed)
     public void OnPurchaseFailed()
     {
-        Debug.LogError("Nákup ponuky zlyhal alebo bol zrušený.");
+        Debug.LogError("IAP Shop: Nákup Starter Packu zlyhal alebo bol zrušený.");
     }
 
     private void GiveRewards()
     {
-        // 1. Pripočítame odmeny do pamäte
-        int noveGemy = PlayerPrefs.GetInt("Gems", 0) + gemsReward;
-        int noveCoiny = PlayerPrefs.GetInt("Coins", 0) + coinsReward;
-
-        PlayerPrefs.SetInt("Gems", noveGemy);
-        PlayerPrefs.SetInt("Coins", noveCoiny);
-        PlayerPrefs.Save();
-
-        // 2. OKAMŽITE prekreslíme čísla na obrazovke!
-        UpdateTopBarUI();
-
-        // 3. Skryjeme celú ponuku z obchodu
-        gameObject.SetActive(false);
-    }
-
-    // Funkcia, ktorá vezme čísla z pamäte a hodí ich do UI textov
-    private void UpdateTopBarUI()
-    {
-        if (totalGemsText != null)
+        // Skontrolujeme, či GameManager na scéne reálne existuje (používame tvoje priradené malé 'instance')
+        if (GameManager.instance != null)
         {
-            totalGemsText.text = PlayerPrefs.GetInt("Gems", 0).ToString();
+            // 1. Cez tvoju originálnu funkciu pridáme Gemy (tá v GameManageri rovno aktualizuje aj štatistiky a UI)
+            GameManager.instance.AddGems(gemsReward);
+
+            // 2. Cez novú funkciu, ktorú sme pridali do GameManageru, pripíšeme Coiny
+            GameManager.instance.AddCoinsFromShop(coinsReward);
+
+            // 3. Skryjeme ponuku z obchodu, keďže už je kúpená
+            gameObject.SetActive(false);
         }
-
-        if (totalCoinsText != null)
+        else
         {
-            totalCoinsText.text = PlayerPrefs.GetInt("Coins", 0).ToString();
+            Debug.LogError("ShopIAPManager: GameManager.instance chýba na scéne! Skontroluj, či máš GameManager v scéne hodený.");
         }
     }
 

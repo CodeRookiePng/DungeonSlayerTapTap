@@ -118,6 +118,14 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
+    // PRIDANÉ: Nová funkcia pre bezpečné pripísanie coinov z obchodu
+    public void AddCoinsFromShop(int amount)
+    {
+        coins += amount;
+        totalCoinsEarned += amount;
+        UpdateUI(); // Prefektne prekreslí horný panel s Coinmi aj štatistiky
+    }
+
     public void AddKill(int baseReward)
     {
         monstersKilled++;
