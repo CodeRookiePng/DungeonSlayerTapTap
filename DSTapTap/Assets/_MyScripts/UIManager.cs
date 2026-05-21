@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI; // Nezabudneme na UI namespace
 
 public class UIManager : MonoBehaviour
 {
@@ -6,20 +7,25 @@ public class UIManager : MonoBehaviour
     public GameObject dungeonScreen;
     public GameObject leaderboardScreen;
     public GameObject upgradeScreen;
-    public GameObject shopScreen;    // Nový šuflík pre tvoj 9:16 Shop s mincami a váhami
-    public GameObject mapScreen;     // Nový šuflík pre tvoju mapu s ostrovmi
+    public GameObject shopScreen;
+    public GameObject mapScreen;
 
-    // Táto funkcia sa spustí pri štarte hry
+    [Header("Special Buttons")]
+    public GameObject statsButton; // Pretiahni sem StatsButton z hierarchie
+
     void Start()
     {
-        // Na začiatku chceme vidieť Dungeon, ostatné vypneme
         ShowDungeon();
     }
 
     public void ShowDungeon()
     {
         DeactivateAllScreens();
+
         dungeonScreen.SetActive(true);
+
+        // Stats Button zapneme LEN tu
+        if (statsButton != null) statsButton.SetActive(true);
     }
 
     public void ShowLeaderboard()
@@ -46,12 +52,12 @@ public class UIManager : MonoBehaviour
         mapScreen.SetActive(true);
     }
 
-    /// <summary>
-    /// Pomocná funkcia, ktorá bleskovo vypne úplne všetky obrazovky.
-    /// Nemusíme tak písať "SetActive(false)" ručne do každej funkcie.
-    /// </summary>
     private void DeactivateAllScreens()
     {
+        // Najprv schováme stats button, akonáhle opúšťame dungeon
+        if (statsButton != null) statsButton.SetActive(false);
+
+        // Potom schováme všetky obrazovky
         if (dungeonScreen != null) dungeonScreen.SetActive(false);
         if (leaderboardScreen != null) leaderboardScreen.SetActive(false);
         if (upgradeScreen != null) upgradeScreen.SetActive(false);
