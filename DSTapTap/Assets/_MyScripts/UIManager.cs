@@ -2,10 +2,12 @@
 
 public class UIManager : MonoBehaviour
 {
-    // Tu si pripravíme "šuflíky" pre tvoje obrazovky
+    [Header("Screens")]
     public GameObject dungeonScreen;
     public GameObject leaderboardScreen;
     public GameObject upgradeScreen;
+    public GameObject shopScreen;    // Nový šuflík pre tvoj 9:16 Shop s mincami a váhami
+    public GameObject mapScreen;     // Nový šuflík pre tvoju mapu s ostrovmi
 
     // Táto funkcia sa spustí pri štarte hry
     void Start()
@@ -16,22 +18,44 @@ public class UIManager : MonoBehaviour
 
     public void ShowDungeon()
     {
+        DeactivateAllScreens();
         dungeonScreen.SetActive(true);
-        leaderboardScreen.SetActive(false);
-        upgradeScreen.SetActive(false);
     }
 
     public void ShowLeaderboard()
     {
-        dungeonScreen.SetActive(false);
+        DeactivateAllScreens();
         leaderboardScreen.SetActive(true);
-        upgradeScreen.SetActive(false);
     }
 
     public void ShowUpgrade()
     {
-        dungeonScreen.SetActive(false);
-        leaderboardScreen.SetActive(false);
+        DeactivateAllScreens();
         upgradeScreen.SetActive(true);
+    }
+
+    public void ShowShop()
+    {
+        DeactivateAllScreens();
+        shopScreen.SetActive(true);
+    }
+
+    public void ShowMap()
+    {
+        DeactivateAllScreens();
+        mapScreen.SetActive(true);
+    }
+
+    /// <summary>
+    /// Pomocná funkcia, ktorá bleskovo vypne úplne všetky obrazovky.
+    /// Nemusíme tak písať "SetActive(false)" ručne do každej funkcie.
+    /// </summary>
+    private void DeactivateAllScreens()
+    {
+        if (dungeonScreen != null) dungeonScreen.SetActive(false);
+        if (leaderboardScreen != null) leaderboardScreen.SetActive(false);
+        if (upgradeScreen != null) upgradeScreen.SetActive(false);
+        if (shopScreen != null) shopScreen.SetActive(false);
+        if (mapScreen != null) mapScreen.SetActive(false);
     }
 }
