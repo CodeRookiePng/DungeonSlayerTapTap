@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 0ce6c99e20210f2428f62cff0525c0af
+guid: b95f5b23fc1d82741af80160af58146e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7597785420634809935
-    second: 3614e288-5d6f-49c3-96ac-c17756cc8a9d_0
+      213: 2650843382823086998
+    second: banner03_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 3614e288-5d6f-49c3-96ac-c17756cc8a9d_0
+      name: banner03_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 571
-        height: 1024
+        x: 26
+        y: 48
+        width: 191
+        height: 322
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1b99b6b2a6e3f8690800000000000000
-      internalID: -7597785420634809935
+      spriteID: 69b6d5c0300b9c420800000000000000
+      internalID: 2650843382823086998
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      3614e288-5d6f-49c3-96ac-c17756cc8a9d_0: -7597785420634809935
+      banner03_0: 2650843382823086998
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
