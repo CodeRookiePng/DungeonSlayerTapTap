@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 012db5ca25c311c419b8be43dc2928ca
+guid: 77a65cf1311b3bd45b1ce5ce59edbb71
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4389417314500756778
-    second: "Untitled - 23. m\xE1ja 2026 o 15.52.06_0"
+      213: -8404671531296757274
+    second: "Untitled - 23. m\xE1ja 2026 o 23.11.20_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "Untitled - 23. m\xE1ja 2026 o 15.52.06_0"
+      name: "Untitled - 23. m\xE1ja 2026 o 23.11.20_0"
       rect:
         serializedVersion: 2
-        x: 90
-        y: 7
-        width: 394
-        height: 949
+        x: 291
+        y: 295
+        width: 424
+        height: 499
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a2544c99ac75aec30800000000000000
-      internalID: 4389417314500756778
+      spriteID: 6e9e73ba5cb9c5b80800000000000000
+      internalID: -8404671531296757274
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "Untitled - 23. m\xE1ja 2026 o 15.52.06_0": 4389417314500756778
+      "Untitled - 23. m\xE1ja 2026 o 23.11.20_0": -8404671531296757274
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
