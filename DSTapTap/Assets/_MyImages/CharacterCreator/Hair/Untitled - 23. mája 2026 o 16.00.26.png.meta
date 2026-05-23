@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: d7bd85df9af91b34fa1041a6b9220856
+guid: b49965861731e4d4c883891d034867c8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 110063094613122208
-    second: sprite_0_0
-  - first:
-      213: 8399387991679549355
-    second: sprite_0_1
+      213: -8151499336787793338
+    second: "Untitled - 23. m\xE1ja 2026 o 16.00.26_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -40,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -49,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -78,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -129,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: sprite_0_0
+      name: "Untitled - 23. m\xE1ja 2026 o 16.00.26_0"
       rect:
         serializedVersion: 2
-        x: 62
-        y: 50
-        width: 327
-        height: 263
+        x: 146
+        y: 266
+        width: 710
+        height: 644
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -144,30 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0ac9b492dc5078100800000000000000
-      internalID: 110063094613122208
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: sprite_0_1
-      rect:
-        serializedVersion: 2
-        x: 190
-        y: 310
-        width: 6
-        height: 15
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: bafbdb660ee909470800000000000000
-      internalID: 8399387991679549355
+      spriteID: 64a6eebaa8e00ee80800000000000000
+      internalID: -8151499336787793338
       vertices: []
       indices: 
       edges: []
@@ -176,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -186,8 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      sprite_0_0: 110063094613122208
-      sprite_0_1: 8399387991679549355
+      "Untitled - 23. m\xE1ja 2026 o 16.00.26_0": -8151499336787793338
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

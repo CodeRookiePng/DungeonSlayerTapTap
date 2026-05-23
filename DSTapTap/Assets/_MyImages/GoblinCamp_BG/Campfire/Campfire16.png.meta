@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: c14849adbf0610a4486705fcec598567
+guid: edc3fc042d36ba34fa348a6eb7defef7
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2656255634667553426
-    second: sprite_4_0
+      213: 325417658558921016
+    second: Campfire16_0
+  - first:
+      213: -8115831138575411340
+    second: Campfire16_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +129,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: sprite_4_0
+      name: Campfire16_0
       rect:
         serializedVersion: 2
-        x: 61
-        y: 50
-        width: 328
-        height: 267
+        x: 231
+        y: 342
+        width: 12
+        height: 18
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +144,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2924df02d6aecd420800000000000000
-      internalID: 2656255634667553426
+      spriteID: 8393b06e2ad148400800000000000000
+      internalID: 325417658558921016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Campfire16_1
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 50
+        width: 327
+        height: 281
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47798283496ce5f80800000000000000
+      internalID: -8115831138575411340
       vertices: []
       indices: 
       edges: []
@@ -161,7 +186,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      sprite_4_0: 2656255634667553426
+      Campfire16_0: 325417658558921016
+      Campfire16_1: -8115831138575411340
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
