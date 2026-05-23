@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d815afe747f2c0a43a583ab9273e11d6
+guid: f9c48078bfe944243ad8849ac791d9cc
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -9212002808193275178
-    second: banner04_0
+      213: 4522717900205820197
+    second: Banner2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: banner04_0
+      name: Banner2_0
       rect:
         serializedVersion: 2
-        x: 26
-        y: 48
-        width: 194
-        height: 323
+        x: 42
+        y: 9
+        width: 286
+        height: 561
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6da2db3d044682080800000000000000
-      internalID: -9212002808193275178
+      spriteID: 5298115c7fbe3ce30800000000000000
+      internalID: 4522717900205820197
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      banner04_0: -9212002808193275178
+      Banner2_0: 4522717900205820197
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
