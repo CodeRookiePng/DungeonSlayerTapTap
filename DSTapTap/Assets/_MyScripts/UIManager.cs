@@ -25,12 +25,13 @@ public class UIManager : MonoBehaviour
     public GameObject babyModel;
     public GameObject hairBowlcut;
     public GameObject hairMessy;
+    public GameObject hairLong;
     public GameObject beardFull;
     public GameObject beardNone;
 
     void Start()
     {
-        // 1. Načítame, čo mal hráč vybraté (vlasy, brada...)
+        // 1. Načítame uložený stav postavy
         LoadCharacter();
 
         // 2. Otvoríme Character Creator na začiatku
@@ -38,42 +39,16 @@ public class UIManager : MonoBehaviour
     }
 
     // --- PREPÍNANIE OBRAZOVIEK ---
-
-    public void ShowCharacterCreator()
-    {
-        DeactivateAllScreens();
-        characterCreator.SetActive(true);
-        postava.SetActive(true); // Postavu chceme vidieť, keď ju tvoríme
-        SetGlobalUI(false);      // Skryjeme NavBar a veci okolo
-    }
-
-    public void ShowDungeon()
-    {
-        DeactivateAllScreens();
-        dungeonScreen.SetActive(true);
-        postava.SetActive(false); // V dungeone postavu (2D modely) zatiaľ schováme, ak tam nehrá rolku
-        SetGlobalUI(true);
-    }
-
-    public void ShowEquipment()
-    {
-        DeactivateAllScreens();
-        equipmentScreen.SetActive(true);
-        postava.SetActive(true); // TU JE TO DÔLEŽITÉ: Zapneme ju, aby stála v Equipmente!
-        SetGlobalUI(true);
-    }
-
+    public void ShowCharacterCreator() { DeactivateAllScreens(); characterCreator.SetActive(true); postava.SetActive(true); SetGlobalUI(false); }
+    public void ShowDungeon() { DeactivateAllScreens(); dungeonScreen.SetActive(true); postava.SetActive(false); SetGlobalUI(true); }
+    public void ShowEquipment() { DeactivateAllScreens(); equipmentScreen.SetActive(true); postava.SetActive(true); SetGlobalUI(true); }
     public void ShowLeaderboard() { DeactivateAllScreens(); leaderboardScreen.SetActive(true); SetGlobalUI(true); }
     public void ShowUpgrade() { DeactivateAllScreens(); upgradeScreen.SetActive(true); SetGlobalUI(true); }
     public void ShowShop() { DeactivateAllScreens(); shopScreen.SetActive(true); SetGlobalUI(true); }
     public void ShowMap() { DeactivateAllScreens(); mapScreen.SetActive(true); SetGlobalUI(true); }
 
-
-    // --- POMOCNÉ FUNKCIE ---
-
     private void DeactivateAllScreens()
     {
-        // Vypíname LEN panely. Objekt "postava" tu nevypíname!
         if (characterCreator != null) characterCreator.SetActive(false);
         if (dungeonScreen != null) dungeonScreen.SetActive(false);
         if (equipmentScreen != null) equipmentScreen.SetActive(false);
@@ -90,41 +65,102 @@ public class UIManager : MonoBehaviour
         if (coinImage != null) coinImage.SetActive(active);
     }
 
-
     // --- SYSTÉM VÝBERU A UKLADANIA (PlayerPrefs) ---
+
+    // Pomocná funkcia na reset vlasov
+    private void ResetAllHair()
+    {
+        if (hairBowlcut != null) hairBowlcut.SetActive(false);
+        if (hairMessy != null) hairMessy.SetActive(false);
+        if (hairLong != null) hairLong.SetActive(false);
+    }
+
+    // Pomocná funkcia na reset brád
+    private void ResetAllBeards()
+    {
+        if (beardFull != null) beardFull.SetActive(false);
+        if (beardNone != null) beardNone.SetActive(false);
+    }
 
     public void SelectHair(GameObject selectedHair)
     {
-        hairBowlcut.SetActive(false);
-        hairMessy.SetActive(false);
-        selectedHair.SetActive(true);
+        ResetAllHair();
 
-        // Uloženie: 0 = Bowlcut, 1 = Messy
-        PlayerPrefs.SetInt("SavedHair", (selectedHair == hairBowlcut) ? 0 : 1);
-        PlayerPrefs.Save();
+        if (selectedHair != null)
+        {
+            selectedHair.SetActive(true);
+
+            // Uloženie: 0 = Bowlcut, 1 = Messy, 2 = Long
+            if (selectedHair == hairBowlcut) PlayerPrefs.SetInt("SavedHair", 0);
+            else if (selectedHair == hairMessy) PlayerPrefs.SetInt("SavedHair", 1);
+            else if (selectedHair == hairLong) PlayerPrefs.SetInt("SavedHair", 2);
+
+            PlayerPrefs.Save();
+        }
+    }
+
+    public void SelectBeard(GameObject selectedBeard)
+    {
+        ResetAllBeards();
+
+        if (selectedBeard != null)
+        {
+            selectedBeard.SetActive(true);
+
+            // Uloženie: 0 = Full Beard, 1 = Beard None
+            if (selectedBeard == beardFull) PlayerPrefs.SetInt("SavedBeard", 0);
+            else if (selectedBeard == beardNone) PlayerPrefs.SetInt("SavedBeard", 1);
+
+            PlayerPrefs.Save();
+        }
     }
 
     public void SelectGender(GameObject selectedGender)
     {
-        maleModel.SetActive(false);
-        babyModel.SetActive(false);
-        selectedGender.SetActive(true);
+        if (maleModel != null) maleModel.SetActive(false);
+        if (babyModel != null) babyModel.SetActive(false);
 
-        // Uloženie: 0 = Male, 1 = Baby
-        PlayerPrefs.SetInt("SavedGender", (selectedGender == maleModel) ? 0 : 1);
-        PlayerPrefs.Save();
+        if (selectedGender != null)
+        {
+            selectedGender.SetActive(true);
+
+            // Uloženie: 0 = Male, 1 = Baby
+            PlayerPrefs.SetInt("SavedGender", (selectedGender == maleModel) ? 0 : 1);
+
+            // Automatické nastavenie podľa genderu
+            if (selectedGender == babyModel)
+            {
+                SelectHair(hairLong);
+                SelectBeard(beardNone); // Baba asi bradu nechce, tak ju hneď vypneme :)
+            }
+            else
+            {
+                SelectHair(hairBowlcut);
+                SelectBeard(beardFull); // Mužovi dáme na začiatok plnú bradu
+            }
+
+            PlayerPrefs.Save();
+        }
     }
 
     private void LoadCharacter()
     {
-        // Načítanie vlasov (ak kľúč neexistuje, dá default 0)
-        int hairID = PlayerPrefs.GetInt("SavedHair", 0);
-        if (hairBowlcut != null) hairBowlcut.SetActive(hairID == 0);
-        if (hairMessy != null) hairMessy.SetActive(hairID == 1);
-
-        // Načítanie pohlavia
+        // 1. Načítanie pohlavia
         int genderID = PlayerPrefs.GetInt("SavedGender", 0);
         if (maleModel != null) maleModel.SetActive(genderID == 0);
         if (babyModel != null) babyModel.SetActive(genderID == 1);
+
+        // 2. Načítanie vlasov
+        ResetAllHair();
+        int hairID = PlayerPrefs.GetInt("SavedHair", 0);
+        if (hairID == 0 && hairBowlcut != null) hairBowlcut.SetActive(true);
+        if (hairID == 1 && hairMessy != null) hairMessy.SetActive(true);
+        if (hairID == 2 && hairLong != null) hairLong.SetActive(true);
+
+        // 3. Načítanie brady
+        ResetAllBeards();
+        int beardID = PlayerPrefs.GetInt("SavedBeard", 0);
+        if (beardID == 0 && beardFull != null) beardFull.SetActive(true);
+        if (beardID == 1 && beardNone != null) beardNone.SetActive(true);
     }
 }
