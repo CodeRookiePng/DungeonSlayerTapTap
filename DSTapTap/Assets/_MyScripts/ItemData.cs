@@ -18,8 +18,13 @@ public enum ItemType
 [CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Clicker Item")]
 public class ItemData : ScriptableObject
 {
+    [Header("Základné Informácie")]
     public string itemName;
     public ItemType itemType;
+
+    [TextArea(2, 5)]
+    [Tooltip("Text, ktorý sa zobrazí v tooltipe pri podržaní kurzora na iteme.")]
+    public string description;
 
     [Header("UI Vizualizácia")]
     public Sprite icon; // Malá štvorcová ikonka do inventára
