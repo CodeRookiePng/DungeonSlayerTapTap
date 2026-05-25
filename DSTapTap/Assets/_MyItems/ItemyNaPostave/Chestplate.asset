@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51ec24609ec819f48a81d5df7da9788a, type: 3}
-  m_Name: Mec_1
+  m_Name: Chestplate
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: "Me\u010D nov\xE1\u010Dika"
-  itemType: 0
-  icon: {fileID: 226559150225956829, guid: d85414800f7881247beb40b56afe6f86, type: 3}
+  itemName: 
+  itemType: 8
+  icon: {fileID: -7686145415860034761, guid: d85414800f7881247beb40b56afe6f86, type: 3}
+  bodyPartSprite: {fileID: -5032304911738540593, guid: a264829d61df3ee44bb0cf7a857402c8, type: 3}

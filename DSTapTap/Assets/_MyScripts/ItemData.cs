@@ -1,24 +1,29 @@
 ﻿using UnityEngine;
 
-// Definuje, aké typy vybaviteľných vecí v hre máš
 public enum ItemType
 {
     Weapon,
     Helmet,
     Potion,
     Ring,
-    Offheld,
+    Offheld, // Štít
     Gloves,
     Book,
-    Trinket
+    Trinket,
+    Chestplate, // NOVÉ
+    Leggings,   // NOVÉ
+    Boots       // NOVÉ
 }
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
 public class ItemData : ScriptableObject
 {
     public string itemName;
-    public ItemType itemType; // Typ veci (podľa tohto skript spozná, kam ju nasadiť)
-    public Sprite icon;       // Obrázok meča/helmy, ktorý si nakreslil
+    public ItemType itemType;
 
-    // Sem môžeš neskôr pridať staty (napr. public int attack;)
+    [Header("UI Vizualizácia")]
+    public Sprite icon; // Malá štvorcová ikonka do inventára
+
+    [Header("Vizuál na Postave (NOVÉ)")]
+    public Sprite bodyPartSprite; // Veľký sprite, ktorý sa vykreslí priamo na postave
 }
