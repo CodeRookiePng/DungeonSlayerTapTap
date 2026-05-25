@@ -40,7 +40,7 @@ public class EnemyHealth : MonoBehaviour
     private Color originalColor;
 
     private Coroutine bossTimerCoroutine;
-    private float bossTimeLeft; // NOVÉ: Pamätá si zostávajúci čas bosa pri prepínaní obrazoviek
+    private float bossTimeLeft; // Pamätá si zostávajúci čas bosa pri prepínaní obrazoviek
 
     private Coroutine orcAnimationCoroutine;
     private bool isBoss = false;
@@ -108,10 +108,14 @@ public class EnemyHealth : MonoBehaviour
         if (GameManager.instance != null)
         {
             GameManager.instance.AddClick();
-            float damageToDeal = GameManager.instance.clickDamage;
-            bool isCrit = Random.Range(0f, 100f) <= GameManager.instance.critChance;
 
-            if (isCrit) damageToDeal *= GameManager.instance.critMultiplier;
+            // ZMENA: Výpočet finálneho DMG (vrátane itemov a kritického zásahu) rieši priamo GameManager
+            float damageToDeal = GameManager.instance.GetFinalClickDamage();
+
+            // Zistíme spätne, či to bol crit, porovnaním vypočítaného damage oproti bežnému (na účely vizuálnych efektov)
+            // Bežný damage je: clickDamage * (1f + activeDamageBoost)
+            float normalDamageWithItems = GameManager.instance.clickDamage * (1f + GameManager.instance.activeDamageBoost);
+            bool isCrit = damageToDeal > normalDamageWithItems;
 
             GameManager.instance.AddDamageStat(damageToDeal);
             TakeDamage(damageToDeal);
@@ -167,8 +171,8 @@ public class EnemyHealth : MonoBehaviour
                 transform.localScale = originalScale * 1.3f;
                 if (spriteRenderer != null) spriteRenderer.color = new Color(1f, 0.6f, 0.6f);
 
-                // Pri úplne novom bossovi nastavíme plný čas zo správcu hry
-                bossTimeLeft = GameManager.instance.bossTimeLimit;
+                // ZMENA: Pri úplne novom bossovi vytiahneme čas upravený o sekundy z itemov
+                bossTimeLeft = GameManager.instance.GetFinalBossTime();
                 bossTimerCoroutine = StartCoroutine(BossTimer(bossTimeLeft));
             }
             else
@@ -209,7 +213,6 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    // UPRAVENÉ: Coroutine si plynule ukladá aktuálny čas do bossTimeLeft každé okienko (frame)
     private IEnumerator BossTimer(float startTime)
     {
         bossTimeLeft = startTime;

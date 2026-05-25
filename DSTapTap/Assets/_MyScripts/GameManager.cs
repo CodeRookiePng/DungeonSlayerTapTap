@@ -5,6 +5,16 @@ using System.Collections;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public static GameManager Instance => instance;
+
+    [Header("Zariadenie na Výbavu (Prepojenie)")]
+    private EquipmentManager equipmentManager;
+
+    [Header("Aktívne % Modifikátory z Výbavy")]
+    public float activeDamageBoost = 0f;
+    public float activeCoinsBoost = 0f;
+    public float activeBossTimeBonus = 0f;
+    public float activeCritChanceBoost = 0f;
 
     [Header("Štatistiky")]
     public int totalClicks = 0;
@@ -13,12 +23,12 @@ public class GameManager : MonoBehaviour
     public int totalCoinsEarned = 0;
     public int totalCoinsSpent = 0;
     public float totalDamageDone = 0f;
-    public int totalGemsEarned = 0; // NOVÉ: Sledovanie celkovo získaných drahokamov
+    public int totalGemsEarned = 0;
 
     [Header("Herná Mena - Gems")]
-    public int gems = 0; // NOVÉ: Aktuálny stav drahokamov
-    public TextMeshProUGUI gemsText; // NOVÉ: Referencia na textové UI pre drahokamy
-    public TextMeshProUGUI statsGemsText; // NOVÉ: Text do panelu štatistík
+    public int gems = 0;
+    public TextMeshProUGUI gemsText;
+    public TextMeshProUGUI statsGemsText;
 
     [Header("Typ Nepriateľa")]
     [Tooltip("0 = Medúza, 1 = Ork")]
@@ -73,10 +83,86 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        // Nájdeme EquipmentManager na scéne
+        equipmentManager = FindObjectOfType<EquipmentManager>();
+
+        UpdateActiveModifiers();
         UpdateUI();
+
         if (statsPanel != null) statsPanel.SetActive(false);
         StartCoroutine(GoldMineRoutine());
         UpdateBossUI();
+    }
+
+    // Táto funkcia sčíta bonusy LEN z vecí, ktoré sú reálne nasadené v EquipmentSlots
+    public void UpdateActiveModifiers()
+    {
+        // Vynulujeme hodnoty
+        activeDamageBoost = 0f;
+        activeCoinsBoost = 0f;
+        activeBossTimeBonus = 0f;
+        activeCritChanceBoost = 0f;
+
+        // VŽDY nájdeme aktuálny EquipmentManager na scéne
+        equipmentManager = FindObjectOfType<EquipmentManager>();
+
+        if (equipmentManager != null)
+        {
+            foreach (var item in equipmentManager.GetEquippedItems().Values)
+            {
+                if (item != null)
+                {
+                    activeDamageBoost += item.damageBoostPercent;
+                    activeCoinsBoost += item.coinsBoostPercent;
+                    activeBossTimeBonus += item.moreBossTimeSeconds;
+                    activeCritChanceBoost += item.critChanceBoostPercent;
+
+                    Debug.Log(
+                        $"[GameManager] Item bonus pripočítaný: " +
+                        $"DMG +{item.damageBoostPercent * 100}% | " +
+                        $"Gold +{item.coinsBoostPercent * 100}% | " +
+                        $"BossTime +{item.moreBossTimeSeconds}s | " +
+                        $"Crit +{item.critChanceBoostPercent * 100}%"
+                    );
+                }
+            }
+
+            Debug.Log(
+                $"[GameManager] Modifikátory prepočítané: " +
+                $"DMG +{activeDamageBoost * 100}% | " +
+                $"Gold +{activeCoinsBoost * 100}% | " +
+                $"BossTime +{activeBossTimeBonus}s | " +
+                $"Crit +{activeCritChanceBoost * 100}%"
+            );
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] EquipmentManager nebol nájdený na scéne!");
+        }
+
+        UpdateUI();
+    }
+
+    // Vypočíta finálny damage kliku vrátane upgradov, % boostov z výbavy a kritických zásahov
+    public float GetFinalClickDamage()
+    {
+        float calculatedDamage = clickDamage * (1f + activeDamageBoost);
+
+        float totalCritChance = (critChance / 100f) + activeCritChanceBoost;
+
+        if (Random.value < totalCritChance)
+        {
+            calculatedDamage *= critMultiplier;
+            Debug.Log("<color=yellow>🎯 KRITICKÝ ZÁSAH!</color>");
+        }
+
+        return calculatedDamage;
+    }
+
+    // Vypočíta finálny časový limit na bossa
+    public float GetFinalBossTime()
+    {
+        return bossTimeLimit + activeBossTimeBonus;
     }
 
     private IEnumerator GoldMineRoutine()
@@ -84,12 +170,16 @@ public class GameManager : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(mineInterval);
+
             if (mineLevel > 0)
             {
                 float baseReward = mineBaseReward * Mathf.Pow(2.2f, mineLevel - 1);
-                int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier);
+
+                int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier * (1f + activeCoinsBoost));
+
                 coins += finalReward;
                 totalCoinsEarned += finalReward;
+
                 UpdateUI();
             }
         }
@@ -103,14 +193,23 @@ public class GameManager : MonoBehaviour
             coins -= mineUpgradePrice;
             mineLevel++;
             mineUpgradePrice = Mathf.RoundToInt(mineUpgradePrice * 2.5f);
+
             UpdateUI();
         }
     }
 
-    public void AddClick() { totalClicks++; UpdateUI(); }
-    public void AddDamageStat(float amount) { totalDamageDone += amount; UpdateUI(); }
+    public void AddClick()
+    {
+        totalClicks++;
+        UpdateUI();
+    }
 
-    // NOVÉ: Pomocná metóda na pridanie drahokamov (využijeme ju aj neskôr)
+    public void AddDamageStat(float amount)
+    {
+        totalDamageDone += amount;
+        UpdateUI();
+    }
+
     public void AddGems(int amount)
     {
         gems += amount;
@@ -118,18 +217,19 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
-    // PRIDANÉ: Nová funkcia pre bezpečné pripísanie coinov z obchodu
     public void AddCoinsFromShop(int amount)
     {
         coins += amount;
         totalCoinsEarned += amount;
-        UpdateUI(); // Prefektne prekreslí horný panel s Coinmi aj štatistiky
+        UpdateUI();
     }
 
     public void AddKill(int baseReward)
     {
         monstersKilled++;
-        int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier);
+
+        int finalReward = Mathf.RoundToInt(baseReward * coinMultiplier * (1f + activeCoinsBoost));
+
         coins += finalReward;
         totalCoinsEarned += finalReward;
 
@@ -137,12 +237,12 @@ public class GameManager : MonoBehaviour
 
         if (nextIsBoss)
         {
-            // NOVÉ: Logika pre drop drahokamu z bossa s 1% šancou
-            int sanca = Random.Range(1, 101); // Kocka od 1 do 100
+            int sanca = Random.Range(1, 101);
+
             if (sanca <= 5)
             {
                 AddGems(1);
-                Debug.Log("<Color=Cyan>Skvelé! Z bossa vypadol vzácny Gem (5% šanca)!</Color>");
+                Debug.Log("<color=cyan>Skvelé! Z bossa vypadol vzácny Gem (5% šanca)!</color>");
             }
 
             currentKills = 0;
@@ -151,6 +251,7 @@ public class GameManager : MonoBehaviour
         else
         {
             currentKills++;
+
             if (currentKills >= killsToBoss)
             {
                 nextIsBoss = true;
@@ -165,12 +266,17 @@ public class GameManager : MonoBehaviour
     {
         currentKills = 0;
         nextIsBoss = false;
+
         UpdateBossUI();
 
         if (boss != null)
         {
             var healthScript = boss.GetComponent<EnemyHealth>();
-            if (healthScript != null) healthScript.ResetEnemy();
+
+            if (healthScript != null)
+            {
+                healthScript.ResetEnemy();
+            }
         }
     }
 
@@ -199,6 +305,7 @@ public class GameManager : MonoBehaviour
             coins -= upgradePrice;
             clickDamage *= 1.5f;
             upgradePrice *= 2;
+
             UpdateUI();
         }
     }
@@ -211,6 +318,7 @@ public class GameManager : MonoBehaviour
             coins -= coinUpgradePrice;
             coinMultiplier *= 1.5f;
             coinUpgradePrice = Mathf.RoundToInt(coinUpgradePrice * 2.25f);
+
             UpdateUI();
         }
     }
@@ -223,6 +331,7 @@ public class GameManager : MonoBehaviour
             coins -= critUpgradePrice;
             critChance += 2f;
             critUpgradePrice = Mathf.RoundToInt(critUpgradePrice * 1.3f);
+
             UpdateUI();
         }
     }
@@ -235,30 +344,38 @@ public class GameManager : MonoBehaviour
     private IEnumerator HandleRespawn(GameObject entity, float delay)
     {
         yield return new WaitForSeconds(delay);
+
         if (entity != null)
         {
             var healthScript = entity.GetComponent<EnemyHealth>();
-            if (healthScript != null) healthScript.ResetEnemy();
+
+            if (healthScript != null)
+            {
+                healthScript.ResetEnemy();
+            }
         }
     }
 
     public void ToggleStats()
     {
-        if (statsPanel != null) { statsPanel.SetActive(!statsPanel.activeSelf); UpdateUI(); }
+        if (statsPanel != null)
+        {
+            statsPanel.SetActive(!statsPanel.activeSelf);
+            UpdateUI();
+        }
     }
 
     public void UpdateUI()
     {
         if (coinText != null) coinText.text = FormatNumbers(coins);
-        if (gemsText != null) gemsText.text = FormatNumbers(gems); // NOVÉ: Zobrazenie aktuálnych drahokamov
+        if (gemsText != null) gemsText.text = FormatNumbers(gems);
 
-        // Aktualizácia štatistického panelu
         if (statsClickText != null) statsClickText.text = "Total Clicks: " + FormatNumbers(totalClicks);
         if (statsKilledText != null) statsKilledText.text = "Monsters Killed: " + FormatNumbers(monstersKilled);
         if (statsEarnedText != null) statsEarnedText.text = "Total Earned: " + FormatNumbers(totalCoinsEarned);
         if (statsSpentText != null) statsSpentText.text = "Total Spent: " + FormatNumbers(totalCoinsSpent);
         if (statsDamageText != null) statsDamageText.text = "Total Damage: " + FormatNumbers(totalDamageDone);
-        if (statsGemsText != null) statsGemsText.text = "Total Gems: " + FormatNumbers(totalGemsEarned); // NOVÉ: Štatistika drahokamov
+        if (statsGemsText != null) statsGemsText.text = "Total Gems: " + FormatNumbers(totalGemsEarned);
 
         if (mineUpgradePriceText != null) mineUpgradePriceText.text = "Price: " + FormatNumbers(mineUpgradePrice);
         if (upgradePriceText != null) upgradePriceText.text = "Price: " + FormatNumbers(upgradePrice);
@@ -267,7 +384,13 @@ public class GameManager : MonoBehaviour
 
         if (mineStatusText != null)
         {
-            float currentProd = (mineLevel == 0) ? 0 : (mineBaseReward * Mathf.Pow(2.2f, mineLevel - 1)) * coinMultiplier;
+            float currentProd = 0f;
+
+            if (mineLevel > 0)
+            {
+                currentProd = mineBaseReward * Mathf.Pow(2.2f, mineLevel - 1) * coinMultiplier * (1f + activeCoinsBoost);
+            }
+
             mineStatusText.text = FormatNumbers(currentProd) + " / " + mineInterval + "s";
         }
     }
@@ -276,6 +399,7 @@ public class GameManager : MonoBehaviour
     {
         if (value >= 1000000) return (value / 1000000f).ToString("F2") + "M";
         if (value >= 1000) return (value / 1000f).ToString("F1") + "k";
+
         return value.ToString("F0");
     }
 }

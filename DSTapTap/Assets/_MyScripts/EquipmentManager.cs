@@ -70,6 +70,12 @@ public class EquipmentManager : MonoBehaviour
         SetupClickListeners();
     }
 
+    // Táto funkcia vracia zoznam nasadených vecí (potrebné pre GameManager)
+    public Dictionary<ItemType, ItemData> GetEquippedItems()
+    {
+        return equippedItems;
+    }
+
     public void EquipItem(ItemData item, InventorySlot sourceSlot)
     {
         if (item == null) return;
@@ -96,6 +102,7 @@ public class EquipmentManager : MonoBehaviour
         // AKTUALIZÁCIA VIZUÁLU POSTAVY (NOVÉ)
         if (equipmentVisuals.TryGetValue(item.itemType, out SpriteRenderer targetVisual))
         {
+            // Pozor: V ItemData.cs musíš mať zadefinovanú premennú public Sprite bodyPartSprite;
             if (targetVisual != null && item.bodyPartSprite != null)
             {
                 targetVisual.sprite = item.bodyPartSprite;
@@ -104,6 +111,12 @@ public class EquipmentManager : MonoBehaviour
         }
 
         sourceSlot.ClearSlot();
+
+        // PREPOJENIE NA GAMEMANAGER: Aktivácia % bonusov predmetu
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.UpdateActiveModifiers();
+        }
     }
 
     public void UnequipItem(ItemType type)
@@ -137,6 +150,12 @@ public class EquipmentManager : MonoBehaviour
                     targetVisual.enabled = false; // Vypneme renderer, keď nič nenesie
                 }
             }
+
+            // PREPOJENIE NA GAMEMANAGER: Deaktivácia % bonusov predmetu
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.UpdateActiveModifiers();
+            }
         }
         else
         {
@@ -146,6 +165,7 @@ public class EquipmentManager : MonoBehaviour
 
     private InventorySlot FindFirstFreeInventorySlot()
     {
+        // OPRAVENÉ: Hľadáme správny skript (InventorySlot) a ukladáme ho priamo do premennej allSlots
         InventorySlot[] allSlots = FindObjectsOfType<InventorySlot>();
         System.Array.Sort(allSlots, (a, b) => a.gameObject.name.CompareTo(b.gameObject.name));
 

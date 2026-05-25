@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51ec24609ec819f48a81d5df7da9788a, type: 3}
+  m_Name: Wand T1
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: Wand T1
+  itemType: 4
+  icon: {fileID: -3779719771918497608, guid: c1f2b3a9c7e6c5348af9eeebfb71986f, type: 3}
+  bodyPartSprite: {fileID: 0}
+  damageBoostPercent: 0
+  coinsBoostPercent: 0
+  moreBossTimeSeconds: 0
+  critChanceBoostPercent: 0
