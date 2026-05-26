@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Mace T1
   itemType: 0
+  description: 
   icon: {fileID: 4715260198903220759, guid: c1f2b3a9c7e6c5348af9eeebfb71986f, type: 3}
   bodyPartSprite: {fileID: 0}
-  damageBoostPercent: 0.03
-  coinsBoostPercent: 0
-  moreBossTimeSeconds: 0
-  critChanceBoostPercent: 0.1
+  damageBoostPercent: 0.1
+  coinsBoostPercent: 1
+  moreBossTimeSeconds: 1
+  critChanceBoostPercent: 4

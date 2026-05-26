@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Shield T1
   itemType: 4
+  description: 
   icon: {fileID: 1188273302171869740, guid: c1f2b3a9c7e6c5348af9eeebfb71986f, type: 3}
   bodyPartSprite: {fileID: 0}
-  damageBoostPercent: 0.01
+  damageBoostPercent: 0.1
   coinsBoostPercent: 0.02
   moreBossTimeSeconds: 0.03
   critChanceBoostPercent: 0.02

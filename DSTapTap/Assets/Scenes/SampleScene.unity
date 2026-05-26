@@ -473,7 +473,6 @@ GameObject:
   - component: {fileID: 67330963}
   - component: {fileID: 67330962}
   - component: {fileID: 67330961}
-  - component: {fileID: 67330964}
   m_Layer: 6
   m_Name: Slot_Ring
   m_TagString: Untagged
@@ -563,20 +562,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 67330959}
   m_CullTransparentMesh: 1
---- !u!114 &67330964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 67330959}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27c978f5543ba7846912913627937dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
-  iconImage: {fileID: 0}
-  currentItem: {fileID: 0}
 --- !u!1 &72492020
 GameObject:
   m_ObjectHideFlags: 0
@@ -3546,7 +3531,6 @@ GameObject:
   - component: {fileID: 346330734}
   - component: {fileID: 346330733}
   - component: {fileID: 346330732}
-  - component: {fileID: 346330735}
   m_Layer: 6
   m_Name: Slot_Potion
   m_TagString: Untagged
@@ -3636,20 +3620,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 346330730}
   m_CullTransparentMesh: 1
---- !u!114 &346330735
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 346330730}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27c978f5543ba7846912913627937dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
-  iconImage: {fileID: 0}
-  currentItem: {fileID: 0}
 --- !u!1 &370757976
 GameObject:
   m_ObjectHideFlags: 0
@@ -7183,10 +7153,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 'ItemToolTipText
+
+'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0110c6e3d8af3424ba3c35e152505bd8, type: 2}
+  m_sharedMaterial: {fileID: 2241163156631340672, guid: 0110c6e3d8af3424ba3c35e152505bd8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7210,18 +7182,18 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 2
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
-  m_characterHorizontalScale: 1
+  m_characterHorizontalScale: 1.1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -7249,7 +7221,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -0.000060954742, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -7718,7 +7690,6 @@ GameObject:
   - component: {fileID: 746921361}
   - component: {fileID: 746921363}
   - component: {fileID: 746921362}
-  - component: {fileID: 746921364}
   m_Layer: 6
   m_Name: Slot_Chestplate
   m_TagString: Untagged
@@ -7785,20 +7756,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 746921360}
   m_CullTransparentMesh: 1
---- !u!114 &746921364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 746921360}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27c978f5543ba7846912913627937dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
-  iconImage: {fileID: 0}
-  currentItem: {fileID: 0}
 --- !u!1 &755101541
 GameObject:
   m_ObjectHideFlags: 0
@@ -8007,10 +7964,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 'ItemToolTipText
+
+'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0110c6e3d8af3424ba3c35e152505bd8, type: 2}
+  m_sharedMaterial: {fileID: 2241163156631340672, guid: 0110c6e3d8af3424ba3c35e152505bd8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8034,18 +7993,18 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 2
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
-  m_characterHorizontalScale: 1
+  m_characterHorizontalScale: 1.1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -8073,7 +8032,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: 0.79667664, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -8175,7 +8134,6 @@ GameObject:
   - component: {fileID: 785655329}
   - component: {fileID: 785655328}
   - component: {fileID: 785655327}
-  - component: {fileID: 785655330}
   m_Layer: 6
   m_Name: Slot_Gloves
   m_TagString: Untagged
@@ -8265,20 +8223,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 785655325}
   m_CullTransparentMesh: 1
---- !u!114 &785655330
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 785655325}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27c978f5543ba7846912913627937dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
-  iconImage: {fileID: 0}
-  currentItem: {fileID: 0}
 --- !u!1 &790468719
 GameObject:
   m_ObjectHideFlags: 0
@@ -8550,10 +8494,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 'ItemToolTipText
+
+'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0110c6e3d8af3424ba3c35e152505bd8, type: 2}
+  m_sharedMaterial: {fileID: 2241163156631340672, guid: 0110c6e3d8af3424ba3c35e152505bd8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8577,18 +8523,18 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 2
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
-  m_characterHorizontalScale: 1
+  m_characterHorizontalScale: 1.1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -9840,7 +9786,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 176, y: -89}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &943844472
@@ -9911,7 +9857,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.16981131, g: 0.14818439, b: 0.14818439, a: 0.6313726}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.78039217}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -10098,7 +10044,6 @@ GameObject:
   - component: {fileID: 961517796}
   - component: {fileID: 961517795}
   - component: {fileID: 961517794}
-  - component: {fileID: 961517797}
   m_Layer: 6
   m_Name: Slot_Book
   m_TagString: Untagged
@@ -10188,20 +10133,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 961517792}
   m_CullTransparentMesh: 1
---- !u!114 &961517797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 961517792}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27c978f5543ba7846912913627937dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
-  iconImage: {fileID: 0}
-  currentItem: {fileID: 0}
 --- !u!1 &971147749
 GameObject:
   m_ObjectHideFlags: 0
@@ -11224,7 +11155,6 @@ GameObject:
   - component: {fileID: 1110407469}
   - component: {fileID: 1110407468}
   - component: {fileID: 1110407467}
-  - component: {fileID: 1110407470}
   m_Layer: 6
   m_Name: Slot_Healm
   m_TagString: Untagged
@@ -11314,20 +11244,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1110407465}
   m_CullTransparentMesh: 1
---- !u!114 &1110407470
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1110407465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27c978f5543ba7846912913627937dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
-  iconImage: {fileID: 0}
-  currentItem: {fileID: 0}
 --- !u!1 &1117145510
 GameObject:
   m_ObjectHideFlags: 0
@@ -15809,7 +15725,6 @@ GameObject:
   - component: {fileID: 1652647169}
   - component: {fileID: 1652647168}
   - component: {fileID: 1652647167}
-  - component: {fileID: 1652647170}
   m_Layer: 6
   m_Name: Slot_Offheld
   m_TagString: Untagged
@@ -15899,20 +15814,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1652647165}
   m_CullTransparentMesh: 1
---- !u!114 &1652647170
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1652647165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27c978f5543ba7846912913627937dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
-  iconImage: {fileID: 0}
-  currentItem: {fileID: 0}
 --- !u!1 &1660983100
 GameObject:
   m_ObjectHideFlags: 0
@@ -17609,7 +17510,6 @@ GameObject:
   - component: {fileID: 1869317177}
   - component: {fileID: 1869317176}
   - component: {fileID: 1869317175}
-  - component: {fileID: 1869317178}
   m_Layer: 6
   m_Name: Slot_Weapon
   m_TagString: Untagged
@@ -17699,20 +17599,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1869317173}
   m_CullTransparentMesh: 1
---- !u!114 &1869317178
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1869317173}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27c978f5543ba7846912913627937dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
-  iconImage: {fileID: 0}
-  currentItem: {fileID: 0}
 --- !u!1 &1871501167
 GameObject:
   m_ObjectHideFlags: 0
@@ -18552,8 +18438,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d43f61a0a97b1f04686a3b63a2f0d5a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryTester
-  testItem: {fileID: 0}
-  targetSlot: {fileID: 0}
+  testItem: {fileID: 11400000, guid: 50e624464e8e9544d94cbb996e858ceb, type: 2}
+  targetSlot: {fileID: 1666242254}
 --- !u!114 &1976044340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19059,7 +18945,6 @@ GameObject:
   - component: {fileID: 2017576223}
   - component: {fileID: 2017576222}
   - component: {fileID: 2017576221}
-  - component: {fileID: 2017576224}
   m_Layer: 6
   m_Name: Slot_Trinket
   m_TagString: Untagged
@@ -19149,20 +19034,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2017576219}
   m_CullTransparentMesh: 1
---- !u!114 &2017576224
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2017576219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27c978f5543ba7846912913627937dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
-  iconImage: {fileID: 0}
-  currentItem: {fileID: 0}
 --- !u!1 &2017695291
 GameObject:
   m_ObjectHideFlags: 0
