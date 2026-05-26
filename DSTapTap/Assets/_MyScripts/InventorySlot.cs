@@ -1,42 +1,102 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class InventorySlot : MonoBehaviour
+public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    [Header("UI Komponenty Slotu")]
+    public Image iconImage;
+
+    [Header("Aktuálny Item v Slote")]
     public ItemData currentItem;
-    private Image myIconImage;
-    private EquipmentManager equipmentManager;
 
     private void Awake()
     {
-        myIconImage = transform.GetChild(0).GetComponent<Image>();
-        equipmentManager = FindObjectOfType<EquipmentManager>();
+        if (iconImage == null)
+        {
+            iconImage = GetComponentInChildren<Image>();
+        }
+    }
 
-        Button btn = gameObject.GetComponent<Button>();
-        if (btn == null) btn = gameObject.AddComponent<Button>();
+    private void Start()
+    {
+        // AUTOMATICKÉ PREPOJENIE: Skript si sám nájde komponent Button na tomto slote
+        Button btn = GetComponent<Button>();
+        if (btn == null)
+        {
+            // Ak na objekte náhodou chýba Button, skript ho pre istotu sám pridá
+            btn = gameObject.AddComponent<Button>();
+        }
 
+        // Priradíme funkciu kliknutia priamo cez kód
+        btn.onClick.RemoveAllListeners();
         btn.onClick.AddListener(OnSlotClicked);
+
+        // Inicializácia vizuálu
+        if (currentItem != null) SetupSlot(currentItem);
+        else ClearSlot();
     }
 
     public void SetupSlot(ItemData newItem)
     {
+        if (newItem == null)
+        {
+            ClearSlot();
+            return;
+        }
+
         currentItem = newItem;
-        myIconImage.sprite = newItem.icon;
-        myIconImage.gameObject.SetActive(true);
+
+        if (iconImage != null)
+        {
+            iconImage.sprite = currentItem.icon;
+            iconImage.color = new Color(1f, 1f, 1f, 1f);
+        }
     }
 
     public void ClearSlot()
     {
         currentItem = null;
-        myIconImage.sprite = null;
-        myIconImage.gameObject.SetActive(false);
+
+        if (iconImage != null)
+        {
+            iconImage.sprite = null;
+            iconImage.color = new Color(1f, 1f, 1f, 0f);
+        }
+
+        if (ItemTooltip.Instance != null) ItemTooltip.Instance.HideTooltip();
     }
 
-    private void OnSlotClicked()
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        if (currentItem != null && equipmentManager != null)
+        if (currentItem != null && ItemTooltip.Instance != null)
         {
-            equipmentManager.EquipItem(currentItem, this);
+            ItemTooltip.Instance.ShowTooltip(currentItem);
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (ItemTooltip.Instance != null)
+        {
+            ItemTooltip.Instance.HideTooltip();
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (ItemTooltip.Instance != null) ItemTooltip.Instance.HideTooltip();
+    }
+
+    public void OnSlotClicked()
+    {
+        if (currentItem != null)
+        {
+            EquipmentManager eqManager = FindObjectOfType<EquipmentManager>();
+            if (eqManager != null)
+            {
+                eqManager.EquipItem(currentItem, this);
+            }
         }
     }
 }

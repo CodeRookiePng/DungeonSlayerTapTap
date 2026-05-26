@@ -1,82 +1,88 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 public class ItemTooltip : MonoBehaviour
 {
-    public static ItemTooltip instance;
+    public static ItemTooltip Instance;
 
-    [Header("UI")]
-    public GameObject tooltipPanel;
+    [Header("UI Referencie (Pretiahni TMP texty z Hierarchy)")]
     public TextMeshProUGUI itemNameText;
-    public TextMeshProUGUI itemDescriptionText;
+    public TextMeshProUGUI itemTypeText;
     public TextMeshProUGUI itemStatsText;
 
-    void Awake()
-    {
-        instance = this;
+    private RectTransform rectTransform;
+    private Canvas canvas;
 
-        if (tooltipPanel != null)
-            tooltipPanel.SetActive(false);
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+
+        rectTransform = GetComponent<RectTransform>();
+        canvas = GetComponentInParent<Canvas>();
+
+        // Na začiatku hry tooltip skryjeme
+        HideTooltip();
     }
 
-    void Update()
+    private void Update()
     {
-        if (tooltipPanel != null && tooltipPanel.activeSelf)
-        {
-            tooltipPanel.transform.position = Input.mousePosition;
-        }
+        if (canvas == null || rectTransform == null) return;
+
+        // Tooltip plynule nasleduje kurzor myši
+        Vector2 mousePosition;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform,
+            Input.mousePosition,
+            canvas.worldCamera,
+            out mousePosition
+        );
+
+        // Jemný posun (offset), aby tooltip nebol priamo pod kurzorom
+        rectTransform.anchoredPosition = mousePosition + new Vector2(15f, -15f);
     }
 
     public void ShowTooltip(ItemData item)
     {
-        if (item == null)
+        if (item == null) return;
+
+        // POISTKA PROTI CHYBE: Ak chýbajú referencie v Unity, skript nespadne
+        if (itemNameText == null || itemTypeText == null || itemStatsText == null)
         {
-            Debug.LogWarning("[ItemTooltip] Item je NULL!");
+            Debug.LogWarning("[ItemTooltip] POZOR! Nemáš priradené textové objekty v Inspectore na objekte ItemTooltip! Tooltip nemôže vypísať text.");
+            gameObject.SetActive(true);
             return;
         }
 
-        if (tooltipPanel == null)
-        {
-            Debug.LogWarning("[ItemTooltip] TooltipPanel nie je priraden�!");
-            return;
-        }
+        gameObject.SetActive(true);
 
-        tooltipPanel.SetActive(true);
+        // Nastavenie textov
+        itemNameText.text = item.itemName;
+        itemTypeText.text = item.itemType.ToString();
 
-        if (itemNameText != null)
-            itemNameText.text = item.itemName;
+        // Dynamické skladanie štatistík
+        string statsString = "";
 
-        if (itemDescriptionText != null)
-            itemDescriptionText.text = item.description;
+        if (item.damageBoostPercent > 0f)
+            statsString += $"<color=#FF5555>Click Damage: +{item.damageBoostPercent * 100f:F0}%</color>\n";
 
-        string stats = "";
+        if (item.coinsBoostPercent > 0f)
+            statsString += $"<color=#FFD700>Gold Boost: +{item.coinsBoostPercent * 100f:F0}%</color>\n";
 
-        if (item.damageBoostPercent > 0)
-            stats += $"Damage: +{item.damageBoostPercent * 100}%\n";
+        if (item.moreBossTimeSeconds > 0f)
+            statsString += $"<color=#55FF55>Boss Time: +{item.moreBossTimeSeconds:F0}s</color>\n";
 
-        if (item.coinsBoostPercent > 0)
-            stats += $"Coins: +{item.coinsBoostPercent * 100}%\n";
+        if (item.critChanceBoostPercent > 0f)
+            statsString += $"<color=#FF9900>Crit Chance: +{item.critChanceBoostPercent * 100f:F0}%</color>\n";
 
-        if (item.moreBossTimeSeconds > 0)
-            stats += $"Boss Time: +{item.moreBossTimeSeconds}s\n";
+        if (string.IsNullOrEmpty(statsString))
+            statsString = "<color=#888888>No bonus stats</color>";
 
-        if (item.critChanceBoostPercent > 0)
-            stats += $"Crit Chance: +{item.critChanceBoostPercent * 100}%\n";
-
-        if (string.IsNullOrEmpty(stats))
-            stats = "�iadne bonusy";
-
-        if (itemStatsText != null)
-            itemStatsText.text = stats;
-
-        Debug.Log("[ItemTooltip] Zobrazujem tooltip pre item: " + item.itemName);
+        itemStatsText.text = statsString;
     }
 
     public void HideTooltip()
     {
-        if (tooltipPanel != null)
-            tooltipPanel.SetActive(false);
-
-        Debug.Log("[ItemTooltip] Tooltip schovan�");
+        gameObject.SetActive(false);
     }
 }
